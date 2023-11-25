@@ -1,14 +1,43 @@
 import EventsPageTemplate from "@/components/template/EventPage";
 import FormEvents from "@/components/template/Form/FormEvents";
+import fetchingData from "@/lib/api";
+import axios from "axios";
+import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 function EventsPage({ data }) {
   const router = useRouter();
-  const { slug } = router.query; // 'slug' will be an array of path segments
+  const { slug } = router.query;
+
+  const handlePageChange = (newPage) => {
+    // Redirect to the same path with new page query parameter
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, page: newPage },
+    });
+  };
+
+  const handleSearchValue = (searchValue) => {
+    // Redirect to the same path with new page query parameter
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, search: searchValue },
+    });
+  };
+
+  // 'slug' will be an array of path segments
 
   // Check if no additional path segments were provided (i.e., the root /events page)
   if (!slug) {
-    return <EventsPageTemplate data={data} />;
+    return (
+      <EventsPageTemplate
+        data={data}
+        handlePageChange={handlePageChange}
+        handleSearchValue={handleSearchValue}
+      />
+    );
+    // return <span>{JSON.stringify(data)}</span>;
   }
 
   // Handle the "create" route
@@ -17,9 +46,10 @@ function EventsPage({ data }) {
   }
 
   // // Handle the "detail" route with an ID
-  if (slug[0] === "detail" && slug[1]) {
-    const eventId = slug[1];
-    return <FormEvents eventId={eventId} isEdit />;
+  if (slug[0] === "edit" && slug[1]) {
+    const slugData = slug[1];
+    const slugId = slug[2];
+    return <FormEvents slug={slugData} id={slugId} isEdit />;
   }
 
   // Fallback or 404 component if the route is not recognized
@@ -28,25 +58,20 @@ function EventsPage({ data }) {
 
 export default EventsPage;
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
+  const { query } = context;
+  const page = query.page || 1;
+  const perPage = query.per_page || 10;
+  const search = query.search || "";
+
   try {
-    const res = await Axios(
-      "https://run.mocky.io/v3/3a0bf739-427b-4718-afad-576073540546"
-    );
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch data with status: ${res.status}`);
-    }
-
-    const result = await res.json();
-    (
-      "🚀 ~ file: index.jsx:39 ~ getServerSideProps ~ result:",
-      result
-    );
-
+    const res = await fetchingData({
+      url: `/admin/event/list?page=${page}&per_page=${perPage}`,
+      context,
+    });
     return {
       props: {
-        data: result,
+        data: res.data || null,
       },
     };
   } catch (error) {

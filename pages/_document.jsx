@@ -1,5 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import { Theme } from "@radix-ui/themes";
+import { Toaster } from "@/components/ui/toaster";
 
 class MyDocument extends Document {
   render() {
@@ -11,6 +12,7 @@ class MyDocument extends Document {
           <Theme>
             <Main />
             <NextScript />
+            <Toaster />
           </Theme>
         </body>
       </Html>

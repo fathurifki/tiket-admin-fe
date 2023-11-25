@@ -1,3 +1,4 @@
+import RootLayout from "@/app/layout";
 import DashboardPage from "./dashboard";
 
 export default function Root({ data }) {
@@ -15,10 +16,7 @@ export async function getServerSideProps() {
     }
 
     const result = await res.json();
-    (
-      "🚀 ~ file: index.jsx:18 ~ getServerSideProps ~ result:",
-      result
-    );
+    "🚀 ~ file: index.jsx:18 ~ getServerSideProps ~ result:", result;
 
     return {
       props: {

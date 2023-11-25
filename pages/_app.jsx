@@ -1,7 +1,8 @@
-import { Lato } from "next/font/google";
 import RootLayout from "../app/layout";
 import { Inter, Mulish, Comic_Neue } from "next/font/google";
-
+import { ToastProvider } from "@/components/ui/toast";
+import { useEffect } from "react";
+import { getCookie } from "cookies-next";
 
 const mulish = Mulish({
   weight: ["400", "700"],
@@ -17,12 +18,29 @@ const comicNeue = Comic_Neue({
   display: "swap",
 });
 
+function MyApp({ Component, pageProps, router }) {
+  const isLoginPage = router.pathname === "/login";
 
-function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    // Get the token from the cookies
+    const token = getCookie("token");
+
+    // If the token doesn't exist, redirect to the login page
+    if (!token && router.pathname !== "/login") {
+      router.push("/login");
+    }
+  }, []);
+
   return (
-    <RootLayout>
-      <Component {...pageProps} />
-    </RootLayout>
+    <ToastProvider>
+      {isLoginPage ? (
+        <Component {...pageProps} />
+      ) : (
+        <RootLayout>
+          <Component {...pageProps} />
+        </RootLayout>
+      )}
+    </ToastProvider>
   );
 }
 

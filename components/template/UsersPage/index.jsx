@@ -126,11 +126,11 @@ function UsersPageTemplate({ ...props }) {
         {/* <DataTable data={data.users} columns={columns}/> */}
         <TanTableCustom
           columns={columns}
-          data={props?.data?.users}
+          data={props?.data?.users || []}
           handlePagePrevious={() => props.handlePageChange(props.page - 1)}
           handlePageChange={() => props.handlePageChange(props.page + 1)}
           handleSearchValue={(value) => props.handleSearchValue(value)}
-          page={props.page}
+          page={props?.data?.page}
           totalPages={props?.data?.total_pages}
           filteredBy="username"
           placeholder="Filter Username"

@@ -1,9 +1,9 @@
 import FormUser from "@/components/template/Form/FormUser";
 import UsersPageTemplate from "@/components/template/UsersPage";
-import Axios from "@/lib/api";
+import fetchingData from "@/lib/api";
 import { useRouter } from "next/router";
 
-function UserPage({ data, page, perPage }) {
+function UserPage({ data = [], page = 1, perPage = 10 }) {
   const router = useRouter();
   const { slug } = router.query; // 'slug' will be an array of path segments
 
@@ -59,23 +59,14 @@ export async function getServerSideProps(context) {
   const search = query.search || "";
 
   try {
-    const res = await Axios.get(
-      `/v1/admin/user/list?page=${page}&per_page=${perPage}&search=${search}`
-    );
-
-    if (res.status !== 200) {
-      throw new Error(`Failed to fetch data with status: ${res.status}`);
-    }
-
-    const result = await res.data;
-    (
-      "🚀 ~ file: [[...slug]].js:49 ~ getServerSideProps ~ result:",
-      result
-    );
+    const res = await fetchingData({
+      url: `/admin/user/list?page=${page}&per_page=${perPage}&search=${search}`,
+      context,
+    });
 
     return {
       props: {
-        data: result,
+        data: res?.data || {},
         page: parseInt(page, 10),
         perPage: parseInt(perPage, 10),
       },

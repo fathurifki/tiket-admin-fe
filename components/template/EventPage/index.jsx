@@ -1,80 +1,139 @@
 import TableSource from "@/components/atoms/Table";
+import { TanTableCustom } from "@/components/atoms/TanTableCustom";
 import TitlePage from "@/components/atoms/TitlePage";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/router";
 
-const EventsPageTemplate = ({ data }) => {
+const EventsPageTemplate = ({ ...props }) => {
   const router = useRouter();
 
-  const tableConfig = [
+  const columns = [
     {
-      headerTitle: "#",
-      type: "index-number",
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    // {
+    //   accessorKey: "id",
+    //   header: ({ column }) => {},
+    //   cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    //   enableSorting: false,
+    //   enableHiding: false,
+    // },
+    {
+      header: "Event Name",
+      accessorKey: "name",
     },
     {
-      headerTitle: "Event Name",
-      key: "event_name",
-      type: "string",
+      header: "Slug Name",
+      accessorKey: "slug",
     },
     {
-      headerTitle: "Slug Name",
-      key: "slug_name",
-      type: "string",
+      header: "Date",
+      accessorKey: "date",
+      cell: ({ row }) => {
+        const events = row.original;
+        try {
+          return <span>{format(new Date(events?.date), "dd-MMMM-yyyy")}</span>;
+        } catch (error) {
+          return <span>Invalid date</span>;
+        }
+      },
     },
     {
-      headerTitle: "Date",
-      key: "date",
-      type: "string",
+      header: "Location",
+      accessorKey: "location",
     },
     {
-      headerTitle: "Time",
-      key: "time",
-      type: "string",
+      header: "Description",
+      accessorKey: "description",
     },
     {
-      headerTitle: "Location",
-      key: "location",
-      type: "string",
+      header: "Status",
+      accessorKey: "status",
     },
     {
-      headerTitle: "Region",
-      key: "region",
-      type: "string",
+      header: "Event Image",
+      accessorKey: "event_image_url",
     },
     {
-      headerTitle: "Description",
-      key: "description",
-      type: "string",
+      header: "Created At",
+      accessorKey: "created_at",
+      cell: ({ row }) => {
+        const events = row.original;
+        try {
+          return (
+            <span>{format(new Date(events?.created_at), "dd-MMMM-yyyy")}</span>
+          );
+        } catch (error) {
+          return <span>Invalid date</span>;
+        }
+      },
     },
     {
-      headerTitle: "Event Image",
-      key: "event_image",
-      type: "string",
-    },
-    {
-      headerTitle: "Event Map",
-      key: "event_map",
-      type: "string",
-    },
-    {
-      headerTitle: "Type",
-      key: "type",
-      type: "string",
-    },
-    {
-      headerTitle: "Category Ticket",
-      //   key: "category_ticket",
-      type: "string",
-    },
-    {
-      headerTitle: "Created At",
-      key: "created_at",
-      type: "string",
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const events = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push({
+                    pathname: `/events/edit/${events.slug}/${events.id}`,
+                  })
+                }
+              >
+                Edit Event
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>View customer</DropdownMenuItem>
+              <DropdownMenuItem>View payment details</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 
   const handleRedirect = () => {
-    router.push('/events/create')
-  }
+    router.push("/events/create");
+  };
 
   return (
     <div className="h-full">
@@ -85,7 +144,23 @@ const EventsPageTemplate = ({ data }) => {
         onClickButton={handleRedirect}
       />
       <div className="mt-6">
-        <TableSource data={data} tableConfig={tableConfig} />
+        <div className="mt-6">
+          {/* <DataTable data={data.users} columns={columns}/> */}
+          <TanTableCustom
+            columns={columns}
+            data={props?.data?.events || []}
+            handlePagePrevious={() =>
+              props.handlePageChange(props.data.page - 1)
+            }
+            handlePageChange={() => props.handlePageChange(props.data.page + 1)}
+            handleSearchValue={(value) => props.handleSearchValue(value)}
+            page={props.data?.page}
+            totalPages={props?.data?.total_pages}
+            filteredBy="name"
+            placeholder="Filter Event"
+          />
+          {/* <TableSource data={data?.users} tableConfig={tableConfig} /> */}
+        </div>
       </div>
     </div>
   );
