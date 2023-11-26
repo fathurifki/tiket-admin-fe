@@ -15,9 +15,10 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "next/image";
-import { setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import fetchingData from "../lib/api";
+import { useEffect } from "react";
 
 const FormSchema = z.object({
   username: z.string().min(1, {
@@ -40,6 +41,12 @@ const LoginPage = ({ onLogin }) => {
     },
   });
 
+  useEffect(() => {
+    if (getCookie("token")) {
+      deleteCookie("token");
+      deleteCookie("refresh_token_admin");
+    }
+  }, []);
 
   async function onSubmit(data) {
     const res = await fetchingData({

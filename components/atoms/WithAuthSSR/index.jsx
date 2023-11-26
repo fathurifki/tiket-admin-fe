@@ -1,5 +1,5 @@
 // utils/withAuthServerSideProps.js
-import { getCookie } from "cookies-next";
+import { deleteCookie, getCookie } from "cookies-next";
 
 export const withAuthServerSideProps = (getServerSidePropsFunc) => {
   return async (context) => {

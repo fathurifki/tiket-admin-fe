@@ -19,3 +19,4 @@ function DashboardPage({ data }) {
 }
 
 export default DashboardPage;
+
