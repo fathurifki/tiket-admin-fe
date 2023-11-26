@@ -45,7 +45,7 @@ function TableBodyWrapper({ item, tableConfig, index }) {
     <TableBody>
       <TableRow>
         {tableConfig?.map((config, i) => (
-          <TableCellWrapper item={item} config={config} index={index + 1} />
+          <TableCellWrapper item={item} config={config} index={index + 1} key={i}/>
         ))}
       </TableRow>
     </TableBody>
