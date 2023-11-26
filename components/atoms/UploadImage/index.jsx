@@ -1,26 +1,48 @@
+import Image from "next/image";
 import React, { useEffect } from "react";
 import ImageUploading from "react-images-uploading";
 
-export function UploadImage({isEdit, onImageUploadFile, ...props }) {
+export function UploadImage({ isEdit, onImageUploadFile, ...props }) {
+  console.log("🚀 ~ file: index.jsx:6 ~ UploadImage ~ props:", props);
   const [images, setImages] = React.useState([]);
+  console.log("🚀 ~ file: index.jsx:8 ~ UploadImage ~ images:", images);
   const maxNumber = 69;
 
   useEffect(() => {
     if (props.value && isEdit) {
-      const payload = {
-        data_url: props.value,
-      };
+      let payload = null;
+      if (typeof props.value === "string") {
+        payload = {
+          data_url: props.value,
+        };
+      } else {
+        payload = props.value[0]
+      }
       setImages([payload]);
     }
   }, [props.value]);
 
   const onImageChange = (imageList, addUpdateIndex) => {
-    // data for submit
+    console.log(
+      "🚀 ~ file: index.jsx:21 ~ onImageChange ~ imageList:",
+      imageList
+    );
     setImages(imageList);
-
-    // Call the onChange function with the new value
     onImageUploadFile(imageList);
-    props?.onChange(imageList);
+    
+    if (props.onChange) {
+      props.onChange(imageList);
+    }
+  };
+
+  const onImageRemoveState = (index) => {
+    setImages((prevImages) => {
+      const filteredImages = prevImages.filter((_, i) => i !== index);
+      if (props.onChange) {
+        props.onChange(filteredImages);
+      }
+      return filteredImages;
+    });
   };
 
   return (
@@ -41,8 +63,12 @@ export function UploadImage({isEdit, onImageUploadFile, ...props }) {
           dragProps,
         }) => (
           // write your building UI
-          <div className="border-dashed border-2 h-[40vh] w-full flex justify-center items-center 2xl:h-[58vh]">
-            {imageList.length === 0 && (
+          <div
+            className={`border-dashed border-2 ${
+              imageList.length === 0 && `h-[40vh]`
+            } w-full flex justify-center items-center 2xl:h-[58vh]`}
+          >
+            {imageList.length === 0 ? (
               <div
                 style={
                   isDragging
@@ -54,33 +80,42 @@ export function UploadImage({isEdit, onImageUploadFile, ...props }) {
               >
                 Click or Drop here
               </div>
+            ) : (
+              imageList.map((image, index) => {
+                return (
+                  <div key={index} className="relative w-full h-full p-6 ">
+                    <div className="relative w-full aspect-video">
+                      <Image
+                        src={image["data_url"]}
+                        alt="image"
+                        layout="fill"
+                        objectFit="scale-down"
+                      />
+                      <>{console.log(">>", imageList)}</>
+                    </div>
+                    <div className="absolute bottom-0 left-0 flex justify-around items-center w-full px-4 py-2">
+                      <div
+                        onClick={() => onImageUpdate(index)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Update
+                      </div>
+                      <div
+                        onClick={() => {
+                          onImageRemoveState(index);
+                          onImageRemove(index);
+                          onImageRemoveAll();
+                          props.onChange(null);
+                        }}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Remove
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
             )}
-            {imageList.map((image, index) => (
-              <div
-                key={index}
-                className="relative w-full h-full p-6 aspect-w-16 aspect-h-9 sm:aspect-h-7 md:aspect-h-5"
-              >
-                <img
-                  src={image["data_url"]}
-                  alt=""
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 flex justify-around items-center w-full px-4 py-2">
-                  <button
-                    onClick={() => onImageUpdate(index)}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Update
-                  </button>
-                  <button
-                    onClick={() => onImageRemove(index)}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         )}
       </ImageUploading>

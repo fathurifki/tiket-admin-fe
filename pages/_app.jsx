@@ -1,8 +1,9 @@
 import RootLayout from "../app/layout";
 import { Inter, Mulish, Comic_Neue } from "next/font/google";
 import { ToastProvider } from "@/components/ui/toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getCookie } from "cookies-next";
+import { Toaster } from "@/components/ui/toaster";
 
 const mulish = Mulish({
   weight: ["400", "700"],
@@ -20,27 +21,52 @@ const comicNeue = Comic_Neue({
 
 function MyApp({ Component, pageProps, router }) {
   const isLoginPage = router.pathname === "/login";
+  const [windowWidth, setWindowWidth] = useState(null);
 
   useEffect(() => {
-    // Get the token from the cookies
-    const token = getCookie("token");
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener("resize", () =>
+        setWindowWidth(window.innerWidth)
+      );
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", () =>
+          setWindowWidth(window.innerWidth)
+        );
+      }
+    };
+  }, []);
 
-    // If the token doesn't exist, redirect to the login page
+  useEffect(() => {
+    const token = getCookie("token");
     if (!token && router.pathname !== "/login") {
       router.push("/login");
     }
   }, []);
 
   return (
-    <ToastProvider>
-      {isLoginPage ? (
-        <Component {...pageProps} />
+    <>
+      {windowWidth > 500 ? (
+        <ToastProvider>
+          {isLoginPage ? (
+            <Component {...pageProps} />
+          ) : (
+            <RootLayout>
+              <Component {...pageProps} />
+            </RootLayout>
+          )}
+          <Toaster />
+        </ToastProvider>
       ) : (
-        <RootLayout>
-          <Component {...pageProps} />
-        </RootLayout>
+        <div className="min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
+          <p>
+            Not support mobile, please use desktop view for better experience
+          </p>
+        </div>
       )}
-    </ToastProvider>
+    </>
   );
 }
 

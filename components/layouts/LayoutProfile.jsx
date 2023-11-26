@@ -62,24 +62,24 @@ export default function LayoutProfile({ children }) {
   const [isLogin, setIsLogin] = useState(null);
   const router = useRouter();
   const login = getCookie("token") && getCookie("role") === "admin";
-  const [windowWidth, setWindowWidth] = useState(null);
+  // const [windowWidth, setWindowWidth] = useState(null);
 
   useEffect(() => {
     setIsClient(true);
     setIsLogin(getCookie("token") && getCookie("role") === "admin");
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth);
-      window.addEventListener("resize", () =>
-        setWindowWidth(window.innerWidth)
-      );
-    }
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("resize", () =>
-          setWindowWidth(window.innerWidth)
-        );
-      }
-    };
+    // if (typeof window !== "undefined") {
+    //   setWindowWidth(window.innerWidth);
+    //   window.addEventListener("resize", () =>
+    //     setWindowWidth(window.innerWidth)
+    //   );
+    // }
+    // return () => {
+    //   if (typeof window !== "undefined") {
+    //     window.removeEventListener("resize", () =>
+    //       setWindowWidth(window.innerWidth)
+    //     );
+    //   }
+    // };
   }, [login]);
 
   const menuItems = [
@@ -96,13 +96,13 @@ export default function LayoutProfile({ children }) {
     { icon: <BsFileEarmarkText />, label: "Static Page", href: "/static-page" },
   ];
 
-  if (windowWidth < 500) {
-    return (
-      <div className="min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
-        <p>Not support mobile, please use desktop view for better experience</p>
-      </div>
-    );
-  }
+  // if (windowWidth < 500) {
+  //   return (
+  //     <div className="min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
+  //       <p>Not support mobile, please use desktop view for better experience</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div>

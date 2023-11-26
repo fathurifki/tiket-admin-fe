@@ -184,6 +184,9 @@ export function TanTableCustom({ ...props }) {
           >
             Previous
           </Button>
+          <span>
+            {props.page || 1} / {props?.totalPages}
+          </span>
           <Button
             variant="outline"
             size="sm"

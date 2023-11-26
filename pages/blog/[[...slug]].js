@@ -46,7 +46,6 @@ export async function getServerSideProps() {
       },
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
     return {
       props: {
         data: null,

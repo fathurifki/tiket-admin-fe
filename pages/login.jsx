@@ -40,6 +40,7 @@ const LoginPage = ({ onLogin }) => {
     },
   });
 
+
   async function onSubmit(data) {
     const res = await fetchingData({
       url: "/auth/login",
@@ -54,14 +55,12 @@ const LoginPage = ({ onLogin }) => {
       setCookie("token", res?.data?.tokens?.access_token);
       setCookie("refresh_token_admin", res?.data?.tokens.refresh_token);
       setCookie("role", res?.data?.role);
-      // if (res?.data?.tokens?.access_token) {
       router.push("/");
-      // }
     } else {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description: res?.errors?.message,
       });
     }
   }

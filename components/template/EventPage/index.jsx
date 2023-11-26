@@ -60,7 +60,7 @@ const EventsPageTemplate = ({ ...props }) => {
       cell: ({ row }) => {
         const events = row.original;
         try {
-          return <span>{format(new Date(events?.date), "dd-MMMM-yyyy")}</span>;
+          return <span>{format(new Date(events?.date), "dd MMMM yyyy")}</span>;
         } catch (error) {
           return <span>Invalid date</span>;
         }
@@ -71,16 +71,8 @@ const EventsPageTemplate = ({ ...props }) => {
       accessorKey: "location",
     },
     {
-      header: "Description",
-      accessorKey: "description",
-    },
-    {
       header: "Status",
       accessorKey: "status",
-    },
-    {
-      header: "Event Image",
-      accessorKey: "event_image_url",
     },
     {
       header: "Created At",
@@ -89,7 +81,7 @@ const EventsPageTemplate = ({ ...props }) => {
         const events = row.original;
         try {
           return (
-            <span>{format(new Date(events?.created_at), "dd-MMMM-yyyy")}</span>
+            <span>{format(new Date(events?.created_at), "dd MMMM yyyy")}</span>
           );
         } catch (error) {
           return <span>Invalid date</span>;
@@ -121,9 +113,6 @@ const EventsPageTemplate = ({ ...props }) => {
               >
                 Edit Event
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );

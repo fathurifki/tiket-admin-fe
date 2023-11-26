@@ -1,17 +1,15 @@
+import withAuth from "@/components/atoms/WithAuth";
+import { withAuthServerSideProps } from "@/components/atoms/WithAuthSSR";
 import EventsPageTemplate from "@/components/template/EventPage";
 import FormEvents from "@/components/template/Form/FormEvents";
 import fetchingData from "@/lib/api";
-import axios from "axios";
-import { getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 function EventsPage({ data }) {
   const router = useRouter();
   const { slug } = router.query;
 
   const handlePageChange = (newPage) => {
-    // Redirect to the same path with new page query parameter
     router.push({
       pathname: router.pathname,
       query: { ...router.query, page: newPage },
@@ -19,7 +17,6 @@ function EventsPage({ data }) {
   };
 
   const handleSearchValue = (searchValue) => {
-    // Redirect to the same path with new page query parameter
     router.push({
       pathname: router.pathname,
       query: { ...router.query, search: searchValue },
@@ -27,7 +24,6 @@ function EventsPage({ data }) {
   };
 
   // 'slug' will be an array of path segments
-
   // Check if no additional path segments were provided (i.e., the root /events page)
   if (!slug) {
     return (
@@ -37,7 +33,6 @@ function EventsPage({ data }) {
         handleSearchValue={handleSearchValue}
       />
     );
-    // return <span>{JSON.stringify(data)}</span>;
   }
 
   // Handle the "create" route
@@ -56,9 +51,7 @@ function EventsPage({ data }) {
   return null;
 }
 
-export default EventsPage;
-
-export async function getServerSideProps(context) {
+export const getServerSideProps = withAuthServerSideProps(async (context) => {
   const { query } = context;
   const page = query.page || 1;
   const perPage = query.per_page || 10;
@@ -72,14 +65,17 @@ export async function getServerSideProps(context) {
     return {
       props: {
         data: res.data || null,
+        res
       },
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
     return {
       props: {
         data: null,
+        error,
       },
     };
   }
-}
+});
+
+export default withAuth(EventsPage);

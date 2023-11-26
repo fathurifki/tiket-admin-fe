@@ -1,3 +1,5 @@
+import withAuth from "@/components/atoms/WithAuth";
+import { withAuthServerSideProps } from "@/components/atoms/WithAuthSSR";
 import FormUser from "@/components/template/Form/FormUser";
 import UsersPageTemplate from "@/components/template/UsersPage";
 import fetchingData from "@/lib/api";
@@ -50,9 +52,9 @@ function UserPage({ data = [], page = 1, perPage = 10 }) {
   return null;
 }
 
-export default UserPage;
+export default withAuth(UserPage);
 
-export async function getServerSideProps(context) {
+export const getServerSideProps = withAuthServerSideProps(async (context) => {
   const { query } = context;
   const page = query.page || 1;
   const perPage = query.per_page || 10;
@@ -69,6 +71,7 @@ export async function getServerSideProps(context) {
         data: res?.data || {},
         page: parseInt(page, 10),
         perPage: parseInt(perPage, 10),
+        res,
       },
     };
   } catch (error) {
@@ -77,7 +80,8 @@ export async function getServerSideProps(context) {
         data: null,
         page: parseInt(page, 10),
         perPage: parseInt(perPage, 10),
+        error
       },
     };
   }
-}
+});

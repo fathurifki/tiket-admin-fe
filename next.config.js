@@ -38,6 +38,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "tiket-minio-api.captain.nerd.8bitmixtape.cc",
+        port: "",
+        pathname: "/tiket-files/**",
+      },
     ],
   },
 };

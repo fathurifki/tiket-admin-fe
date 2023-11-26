@@ -19,7 +19,7 @@ function StaticPage({ data }) {
   // // Handle the "detail" route with an ID
   if (slug[0] === "detail" && slug[1]) {
     const eventId = slug[1];
-    return <FormStaticPage eventId={eventId} isEdit/>;
+    return <FormStaticPage eventId={eventId} isEdit />;
   }
 
   // Fallback or 404 component if the route is not recognized
@@ -39,18 +39,12 @@ export async function getServerSideProps() {
     }
 
     const result = await res.json();
-    (
-      "🚀 ~ file: index.jsx:39 ~ getServerSideProps ~ result:",
-      result
-    );
-
     return {
       props: {
         data: result,
       },
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
     return {
       props: {
         data: null,

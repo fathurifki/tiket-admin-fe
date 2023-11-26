@@ -59,17 +59,10 @@ const FormSchema = z.object({
   date: z.date(),
   time: z.any(),
   location: z.string(),
-  region: z.string(),
+  region: z.string().optional(),
   description: z.string(),
-  // category_ticket: z.array(
-  //   z.object({
-  //     sectionName: z.string(),
-  //     ticketQuota: z.number(),
-  //     ticketPriceBase: z.number(),
-  //   })
-  // ),
   event_image: z.any(),
-  event_map: z.any(),
+  event_map: z.any().optional(),
   status: z.string(),
 });
 
@@ -111,7 +104,6 @@ const FormEvents = ({ ...props }) => {
   const eventName = watch("event_name");
   const eventSlug = watch("slug_name");
   const eventMap = watch("event_map");
-  const eventTime = watch("time");
 
   useEffect(() => {
     if (props.isEdit) {
@@ -130,9 +122,8 @@ const FormEvents = ({ ...props }) => {
         })
       );
     } else {
-      console.error("Error: slugify: string argument expected");
+      setValue("slug_name", eventSlug);
     }
-    setValue("event_map", eventMap?.[0]?.file);
   }, [eventName, setValue]);
 
   const onClickButton = () => {
@@ -214,7 +205,7 @@ const FormEvents = ({ ...props }) => {
         ...res.data,
         slug_name: res?.data?.slug,
         date: new Date(res.data.date),
-        // time: timeObject,
+        time: timeObject,
         event_image: res.data.event_image_url,
         event_map: res?.data?.event_map_url,
       });
@@ -251,16 +242,24 @@ const FormEvents = ({ ...props }) => {
       const { event_image, event_map, time, ...newPayload } = payload;
 
       formData.append("payload", JSON.stringify(newPayload));
-      formData.append(
-        "event_map",
-        (data?.event_map && data?.event_map?.[0]?.file) ||
-          state.eventMapFile[0].file
-      );
-      formData.append(
-        "event_image",
-        (data?.event_image && data?.event_image?.[0]?.file) ||
-          state.eventImageFile[0].file
-      );
+
+      if (data?.event_image) {
+        formData.append(
+          "event_image",
+          Array.isArray(data?.event_image)
+            ? data?.event_image?.[0]?.file
+            : data?.event_image || state.eventImageFile[0].file
+        );
+      }
+
+      if (data?.event_map) {
+        formData.append(
+          "event_map",
+          Array.isArray(data?.event_map)
+            ? data?.event_map?.[0]?.file
+            : data?.event_map || state.eventMapFile[0].file
+        );
+      }
 
       req = await fetchingData({
         url: props.isEdit
@@ -278,13 +277,15 @@ const FormEvents = ({ ...props }) => {
             description: req?.message,
           });
           router.push("/events");
+        } else {
+          toast({
+            title: "You submitted the following values:",
+            description: req?.message,
+          });
         }
       });
     } catch (error) {
-      toast({
-        title: "You submitted the following values:",
-        description: req?.message,
-      });
+      return false;
     }
   }
 
@@ -416,7 +417,7 @@ const FormEvents = ({ ...props }) => {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="region"
@@ -550,34 +551,36 @@ const FormEvents = ({ ...props }) => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => field.onChange(value)}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="scheduled">On Going</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {props.isEdit && (
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-2">
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => field.onChange(value)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="scheduled">On Going</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <Button onClick={onSubmit}>Submit</Button>
         </form>
       </Form>
