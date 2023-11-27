@@ -17,10 +17,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { LogOutIcon } from "lucide-react";
 import LoginPage from "../template/LoginPage";
-import { getCookie } from "cookies-next";
+import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 
 function Sidebar({ menuItems }) {
+  const router = useRouter();
+
+  const logoutButton = () => {
+      deleteCookie("access_token");
+      router.push("/login");
+  }
+
   return (
     <div className="lg:bg-[#f5f8fa] fixed p-4 border-r shadow-md lg:w-64 lg:h-full hidden md:block md:h-full md:w-20">
       <div>
@@ -49,7 +56,7 @@ function Sidebar({ menuItems }) {
           ))}
         </div>
       </div>
-      <div className="absolute bottom-0 flex pb-6 gap-2 lg:items-start md:items-center">
+      <div onClick={logoutButton} className="absolute bottom-0 flex pb-6 gap-2 lg:items-start md:items-center">
         <LogOutIcon />
         <span className="hidden lg:block">Logout</span>
       </div>

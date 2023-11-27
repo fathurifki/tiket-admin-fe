@@ -1,6 +1,6 @@
 import React from "react";
 import dynamic from "next/dynamic";
-import 'react-quill/dist/quill.snow.css';
+import "react-quill/dist/quill.snow.css";
 
 const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -58,7 +58,13 @@ const MyEditor = ({ ...props }) => {
   ];
 
   return (
-    <QuillNoSSRWrapper modules={modules} formats={formats} theme="snow" />
+    <QuillNoSSRWrapper
+      onChange={handleModelChange}
+      value={model}
+      modules={modules}
+      formats={formats}
+      theme="snow"
+    />
 
     // <FroalaEditor
     //   tag="textarea"

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -45,7 +45,6 @@ import {
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
 import MyEditor from "@/components/atoms/WYSIWYG";
-
 
 const FormSchema = z.object({
   event_name: z.string().min(1, {
@@ -272,13 +271,14 @@ const FormEvents = ({ ...props }) => {
         if (res.status === 200) {
           toast({
             title: "You submitted the following values:",
-            description: req?.message,
+            description: res?.message,
           });
           router.push("/events");
         } else {
           toast({
+            variant: "destructive",
             title: "You submitted the following values:",
-            description: req?.message,
+            description: res?.message,
           });
         }
       });
@@ -543,8 +543,7 @@ const FormEvents = ({ ...props }) => {
               <FormItem className="flex flex-col gap-2">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <MyEditor />
-                  {/* <Textarea {...field} /> */}
+                  <MyEditor {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
