@@ -1,3 +1,5 @@
+"use client"
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -43,26 +45,27 @@ import {
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
 
-const MyEditor = dynamic(() => import("@/components/atoms/WYSIWYG"), {
-  ssr: false,
-});
 
-const FormSchema = z.object({
-  event_name: z.string().min(1, {
-    message: "Username must be at least 2 characters.",
-  }),
-  slug_name: z.string().min(1, {
-    message: "slug must be at least 1",
-  }),
-  date: z.date(),
-  time: z.any(),
-  location: z.string(),
-  region: z.string().optional(),
-  description: z.string(),
-  event_image: z.any(),
-  event_map: z.any().optional(),
-  status: z.string(),
-});
+// const MyEditor = dynamic(() => import("@/components/atoms/WYSIWYG"), {
+//   ssr: false,
+// });
+
+// const FormSchema = z.object({
+//   event_name: z.string().min(1, {
+//     message: "Username must be at least 2 characters.",
+//   }),
+//   slug_name: z.string().min(1, {
+//     message: "slug must be at least 1",
+//   }),
+//   date: z.date(),
+//   time: z.any(),
+//   location: z.string(),
+//   region: z.string().optional(),
+//   description: z.string(),
+//   event_image: z.any(),
+//   event_map: z.any().optional(),
+//   status: z.string(),
+// });
 
 const FormEvents = ({ ...props }) => {
   const { toast } = useToast();
@@ -76,7 +79,7 @@ const FormEvents = ({ ...props }) => {
   });
 
   const form = useForm({
-    resolver: zodResolver(FormSchema),
+    // resolver: zodResolver(FormSchema),
     defaultValues: {
       slug_name: "",
       event_name: "",
@@ -536,7 +539,7 @@ const FormEvents = ({ ...props }) => {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
@@ -548,7 +551,7 @@ const FormEvents = ({ ...props }) => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           {props.isEdit && (
             <FormField
               control={form.control}
