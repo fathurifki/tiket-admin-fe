@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
+import MyEditor from "@/components/atoms/WYSIWYG";
 
 
 // const MyEditor = dynamic(() => import("@/components/atoms/WYSIWYG"), {
@@ -539,7 +540,7 @@ const FormEvents = ({ ...props }) => {
               </FormItem>
             )}
           />
-          {/* <FormField
+          <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
@@ -551,7 +552,7 @@ const FormEvents = ({ ...props }) => {
                 <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
           {props.isEdit && (
             <FormField
               control={form.control}
