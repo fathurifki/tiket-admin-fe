@@ -13,10 +13,12 @@ export function UploadImage({ isEdit, onImageUploadFile, ...props }) {
         payload = {
           data_url: props.value,
         };
-      } else {
+      } else if (Array.isArray(props.value) && props.value.length > 0) {
         payload = props.value[0];
       }
-      setImages([payload]);
+      if (payload) {
+        setImages([payload]);
+      }
     }
   }, [props.value]);
 
