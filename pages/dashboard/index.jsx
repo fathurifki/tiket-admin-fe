@@ -1,14 +1,5 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import TitlePage from "@/components/atoms/TitlePage";
-import TableSource from "@/components/atoms/Table";
+import { withAuthServerSideProps } from "@/components/atoms/WithAuthSSR";
 
 function DashboardPage({ data }) {
   return (
@@ -17,6 +8,36 @@ function DashboardPage({ data }) {
     </div>
   );
 }
+
+export const getServerSideProps = withAuthServerSideProps(async (context) => {
+  const { query } = context;
+  const page = query.page || 1;
+  const perPage = query.per_page || 10;
+  const search = query.search || "";
+
+  try {
+    const res = await fetchingData({
+      url: `/admin/event/list?page=${page}&per_page=${perPage}`,
+      context,
+      headers: {
+        "content-type": "application/json; charset=UTF-8",
+      },
+    });
+    return {
+      props: {
+        data: res.data || null,
+        res,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        data: null,
+        error,
+      },
+    };
+  }
+});
 
 export default DashboardPage;
 

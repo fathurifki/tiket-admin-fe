@@ -38,7 +38,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
     "lucide-react": "^0.287.0",
-    "next": "14.0.0",
+    "next": "13.5.4",
     "react": "^18",
     "react-day-picker": "^8.9.1",
     "react-dom": "^18",
