@@ -44,7 +44,6 @@ import {
 } from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
-import MyEditor from "@/components/atoms/WYSIWYG";
 
 
 const FormSchema = z.object({

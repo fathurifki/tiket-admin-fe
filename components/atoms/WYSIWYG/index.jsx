@@ -1,21 +1,17 @@
 "use client";
 
 import React from "react";
+
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
-import dynamic from "next/dynamic";
-
-const FroalaEditor = dynamic(import("react-froala-wysiwyg"), {
-  ssr: false,
-});
 
 const MyEditor = ({ ...props }) => {
-  const [model, setModel] = React.useState("");
-  let [loaded, setLoaded] = React.useState(false);
+  const FroalaEditor =
+    typeof window !== "undefined"
+      ? require("react-froala-wysiwyg").default
+      : () => null;
 
-  React.useEffect(() => {
-    setLoaded(true);
-  }, []);
+  const [model, setModel] = React.useState("");
 
   React.useEffect(() => {
     setModel(props.value);
@@ -26,16 +22,13 @@ const MyEditor = ({ ...props }) => {
     props.onChange(model);
   };
 
-  if (loaded) {
-    return (
-      <FroalaEditor
-        tag="textarea"
-        model={model}
-        onModelChange={handleModelChange}
-      />
-    );
-  }
-  return null;
+  return (
+    <FroalaEditor
+      tag="textarea"
+      model={model}
+      onModelChange={handleModelChange}
+    />
+  );
 };
 
 export default MyEditor;
