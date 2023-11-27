@@ -44,11 +44,8 @@ import {
 } from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
+import MyEditor from "@/components/atoms/WYSIWYG";
 
-
-const MyEditor = dynamic(() => import("@/components/atoms/WYSIWYG"), {
-  ssr: false,
-});
 
 const FormSchema = z.object({
   event_name: z.string().min(1, {
