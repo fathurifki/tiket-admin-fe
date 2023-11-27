@@ -50,22 +50,22 @@ import fetchingData from "../../../../lib/api";
 //   ssr: false,
 // });
 
-// const FormSchema = z.object({
-//   event_name: z.string().min(1, {
-//     message: "Username must be at least 2 characters.",
-//   }),
-//   slug_name: z.string().min(1, {
-//     message: "slug must be at least 1",
-//   }),
-//   date: z.date(),
-//   time: z.any(),
-//   location: z.string(),
-//   region: z.string().optional(),
-//   description: z.string(),
-//   event_image: z.any(),
-//   event_map: z.any().optional(),
-//   status: z.string(),
-// });
+const FormSchema = z.object({
+  event_name: z.string().min(1, {
+    message: "Username must be at least 2 characters.",
+  }),
+  slug_name: z.string().min(1, {
+    message: "slug must be at least 1",
+  }),
+  date: z.date(),
+  time: z.any(),
+  location: z.string(),
+  region: z.string().optional(),
+  description: z.string(),
+  event_image: z.any(),
+  event_map: z.any().optional(),
+  status: z.string(),
+});
 
 const FormEvents = ({ ...props }) => {
   const { toast } = useToast();
@@ -79,7 +79,7 @@ const FormEvents = ({ ...props }) => {
   });
 
   const form = useForm({
-    // resolver: zodResolver(FormSchema),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       slug_name: "",
       event_name: "",
