@@ -19,9 +19,6 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
     const res = await fetchingData({
       url: `/admin/event/list?page=${page}&per_page=${perPage}`,
       context,
-      headers: {
-        "content-type": "application/json; charset=UTF-8",
-      },
     });
     return {
       props: {
