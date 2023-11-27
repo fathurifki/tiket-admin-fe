@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
+import MyEditor from "@/components/atoms/WYSIWYG";
 
 
 const FormSchema = z.object({
@@ -542,7 +543,8 @@ const FormEvents = ({ ...props }) => {
               <FormItem className="flex flex-col gap-2">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <MyEditor />
+                  {/* <Textarea {...field} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
