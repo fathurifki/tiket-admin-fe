@@ -64,6 +64,9 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
     const res = await fetchingData({
       url: `/admin/user/list?page=${page}&per_page=${perPage}&search=${search}`,
       context,
+      headers: {
+        "content-type": "application/json; charset=UTF-8",
+      },
     });
 
     return {
@@ -80,7 +83,7 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
         data: null,
         page: parseInt(page, 10),
         perPage: parseInt(perPage, 10),
-        error
+        error,
       },
     };
   }
