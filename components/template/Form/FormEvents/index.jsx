@@ -543,7 +543,7 @@ const FormEvents = ({ ...props }) => {
               <FormItem className="flex flex-col gap-2">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <MyEditor {...field} />
+                  <Textarea {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
