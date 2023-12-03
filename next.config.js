@@ -44,6 +44,12 @@ const nextConfig = {
         port: "",
         pathname: "/tiket-files/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

@@ -21,7 +21,9 @@ const comicNeue = Comic_Neue({
 
 function MyApp({ Component, pageProps, router }) {
   const isLoginPage = router.pathname === "/login";
-  const [windowWidth, setWindowWidth] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1000
+  );
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -37,13 +39,6 @@ function MyApp({ Component, pageProps, router }) {
         );
       }
     };
-  }, []);
-
-  useEffect(() => {
-    const token = getCookie("token");
-    if (!token && router.pathname !== "/login") {
-      router.push("/login");
-    }
   }, []);
 
   return (

@@ -1,11 +1,11 @@
 import withAuth from "@/components/atoms/WithAuth";
 import { withAuthServerSideProps } from "@/components/atoms/WithAuthSSR";
-import BannerPageTemplate from "@/components/template/BannerPage";
-import FormBanner from "@/components/template/Form/FormBanner";
+import BlogCategoryTemplate from "@/components/template/BlogCategoryPage";
+import FormBlog from "@/components/template/Form/FormBlog";
 import fetchingData from "@/lib/api";
 import { useRouter } from "next/router";
 
-function BannerPage({ data }) {
+function BlogCategoryPage({ data }) {
   const router = useRouter();
   const { slug } = router.query; // 'slug' will be an array of path segments
 
@@ -26,7 +26,7 @@ function BannerPage({ data }) {
   // Check if no additional path segments were provided (i.e., the root /events page)
   if (!slug) {
     return (
-      <BannerPageTemplate
+      <BlogCategoryTemplate
         data={data}
         handlePageChange={handlePageChange}
         handleSearchValue={handleSearchValue}
@@ -34,30 +34,33 @@ function BannerPage({ data }) {
     );
   }
 
-  // // Handle the "create" route
+  // Handle the "create" route
   if (slug[0] === "create") {
-    return <FormBanner />;
+    return <FormBlog />;
   }
 
   // // Handle the "detail" route with an ID
   if (slug[0] === "edit" && slug[1]) {
-    const eventId = slug[1];
-    return <FormBanner eventId={eventId} isEdit />;
+    const slugData = slug[1];
+    const slugId = slug[2];
+    return <FormBlog slug={slugData} id={slugId} isEdit />;
   }
 
   // Fallback or 404 component if the route is not recognized
   return null;
 }
 
+export default withAuth(BlogCategoryPage);
 
 export const getServerSideProps = withAuthServerSideProps(async (context) => {
   const { query } = context;
   const page = query.page || 1;
   const perPage = query.per_page || 10;
   const search = query.search || "";
+
   try {
     const res = await fetchingData({
-      url: `/admin/banner/list?page=${page}&per_page=${perPage}`,
+      url: `/admin/blog/category/list?page=${page}&per_page=${perPage}`,
       context,
       headers: {
         "content-type": "application/json; charset=UTF-8",
@@ -73,9 +76,8 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
     return {
       props: {
         data: null,
+        error,
       },
     };
   }
 });
-
-export default withAuth(BannerPage);

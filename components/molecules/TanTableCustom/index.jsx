@@ -29,7 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function TanTableCustom({ ...props }) {
+export function TanTableCustom({ searchFilter = true, ...props }) {
   TanTableCustom.propTypes = {
     data: PropTypes.array.isRequired,
     columns: PropTypes.array.isRequired,
@@ -40,6 +40,7 @@ export function TanTableCustom({ ...props }) {
     totalPages: PropTypes.number.isRequired,
     filteredBy: PropTypes.string.isRequired,
     placeholder: PropTypes.string.isRequired,
+    searchFilter: PropTypes.bool,
   };
 
   const [sorting, setSorting] = React.useState([]);
@@ -69,17 +70,19 @@ export function TanTableCustom({ ...props }) {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-          placeholder={props?.placeholder}
-          value={table.getColumn(props?.filteredBy)?.getFilterValue() || ""}
-          onChange={(event) => {
-            table
-              .getColumn(props?.filteredBy)
-              ?.setFilterValue(event.target.value);
-            props.handleSearchValue(event.target.value);
-          }}
-          className="max-w-sm"
-        />
+        {searchFilter && (
+          <Input
+            placeholder={props?.placeholder}
+            value={table.getColumn(props?.filteredBy)?.getFilterValue() || ""}
+            onChange={(event) => {
+              table
+                .getColumn(props?.filteredBy)
+                ?.setFilterValue(event.target.value);
+              props.handleSearchValue(event.target.value);
+            }}
+            className="max-w-sm"
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

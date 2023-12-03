@@ -1,4 +1,4 @@
-import { TanTableCustom } from "@/components/atoms/TanTableCustom";
+import { TanTableCustom } from "@/components/molecules/TanTableCustom";
 import TitlePage from "@/components/atoms/TitlePage";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";

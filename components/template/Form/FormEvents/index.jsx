@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { CalendarIcon, Clock, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { UploadImage } from "@/components/atoms/UploadImage";
+import { UploadImage } from "@/components/molecules/UploadImage";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 import slugify from "slugify";
@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import TimePicker from "@/components/atoms/TimePicker";
+import TimePicker from "@/components/molecules/TimePicker";
 import {
   Select,
   SelectContent,
@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/select";
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
-import MyEditor from "@/components/atoms/WYSIWYG";
+import MyEditor from "@/components/molecules/WYSIWYG";
 
 const FormSchema = z.object({
   event_name: z.string().min(1, {

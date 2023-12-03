@@ -1,33 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   BsBook,
-  BsBuildingFill,
   BsCalendarFill,
   BsCardImage,
   BsCreditCardFill,
   BsFileEarmarkText,
+  BsGlobe,
   BsHouseFill,
   BsPeopleFill,
-  BsPersonFill,
-  BsTicketFill,
 } from "react-icons/bs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Link from "next/link";
-import Image from "next/image";
 import { LogOutIcon } from "lucide-react";
-import LoginPage from "../template/LoginPage";
-import { deleteCookie, getCookie } from "cookies-next";
+import { deleteCookie,} from "cookies-next";
 import { useRouter } from "next/router";
-import ImageAssets from "../assets";
 
 function Sidebar({ menuItems }) {
   const router = useRouter();
 
   const logoutButton = () => {
-      deleteCookie("access_token");
-      router.push("/login");
-  }
+    deleteCookie("access_token");
+    router.push("/login");
+  };
 
   return (
     <div className="lg:bg-[#f5f8fa] fixed p-4 border-r shadow-md lg:w-64 lg:h-full hidden md:block md:h-full md:w-20">
@@ -39,18 +40,50 @@ function Sidebar({ menuItems }) {
             </h1>
           </div>
         </div>
-        <div className="flex flex-col gap-4 p-2 h-full lg:items-start md:items-center">
+        <div className="flex flex-col gap-8 p-2 h-full lg:items-start md:items-center">
           {menuItems.map((item, index) => (
-            <Link href={item.href} key={index} className="mb-6 text-xl">
-              <div className="flex items-center gap-6">
-                <div>{item.icon}</div>
-                <div className="hidden lg:block">{item.label}</div>
-              </div>
-            </Link>
+            <>
+              {item.children ? (
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-xl">
+                      <div className="flex items-center gap-6">
+                        <div>{item.icon}</div>
+                        <div className="hidden lg:block">{item.label}</div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {item.children.map((v, childIndex) => (
+                        <Link
+                          href={v.href}
+                          key={childIndex}
+                          className="text-xl"
+                        >
+                          <div className="flex items-center gap-6 py-2">
+                            <div>{v.icon}</div>
+                            <div className="hidden lg:block">{v.label}</div>
+                          </div>
+                        </Link>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              ) : (
+                <Link href={item.href} key={index} className="text-xl">
+                  <div className="flex items-center gap-6">
+                    <div>{item.icon}</div>
+                    <div className="hidden lg:block">{item.label}</div>
+                  </div>
+                </Link>
+              )}
+            </>
           ))}
         </div>
       </div>
-      <div onClick={logoutButton} className="absolute bottom-0 flex pb-6 gap-2 lg:items-start md:items-center cursor-pointer">
+      <div
+        onClick={logoutButton}
+        className="absolute bottom-0 flex pb-6 gap-2 lg:items-start md:items-center cursor-pointer"
+      >
         <LogOutIcon />
         <span className="hidden lg:block">Logout</span>
       </div>
@@ -59,30 +92,6 @@ function Sidebar({ menuItems }) {
 }
 
 export default function LayoutProfile({ children }) {
-  const [isClient, setIsClient] = useState(false);
-  const [isLogin, setIsLogin] = useState(null);
-  const router = useRouter();
-  const login = getCookie("token") && getCookie("role") === "admin";
-  // const [windowWidth, setWindowWidth] = useState(null);
-
-  useEffect(() => {
-    setIsClient(true);
-    setIsLogin(getCookie("token") && getCookie("role") === "admin");
-    // if (typeof window !== "undefined") {
-    //   setWindowWidth(window.innerWidth);
-    //   window.addEventListener("resize", () =>
-    //     setWindowWidth(window.innerWidth)
-    //   );
-    // }
-    // return () => {
-    //   if (typeof window !== "undefined") {
-    //     window.removeEventListener("resize", () =>
-    //       setWindowWidth(window.innerWidth)
-    //     );
-    //   }
-    // };
-  }, [login]);
-
   const menuItems = [
     { icon: <BsHouseFill />, label: "Dashboard", href: "/" },
     { icon: <BsCalendarFill />, label: "Events", href: "/events" },
@@ -93,17 +102,17 @@ export default function LayoutProfile({ children }) {
       label: "Transactions",
       href: "/transactions",
     },
-    { icon: <BsBook />, label: "Blog", href: "/blog" },
+    {
+      icon: <BsBook />,
+      label: "Blog",
+      href: "",
+      children: [
+        { icon: <BsBook />, label: "List", href: "/blog" },
+        { icon: <BsGlobe />, label: "Category", href: "/blog-category" },
+      ],
+    },
     { icon: <BsFileEarmarkText />, label: "Static Page", href: "/static-page" },
   ];
-
-  // if (windowWidth < 500) {
-  //   return (
-  //     <div className="min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
-  //       <p>Not support mobile, please use desktop view for better experience</p>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div>

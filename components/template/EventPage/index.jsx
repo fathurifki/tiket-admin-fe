@@ -1,5 +1,5 @@
 import TableSource from "@/components/atoms/Table";
-import { TanTableCustom } from "@/components/atoms/TanTableCustom";
+import { TanTableCustom } from "@/components/molecules/TanTableCustom";
 import TitlePage from "@/components/atoms/TitlePage";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -93,7 +93,6 @@ const EventsPageTemplate = ({ ...props }) => {
       header: "Actions",
       cell: ({ row }) => {
         const events = row.original;
-
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -134,7 +133,6 @@ const EventsPageTemplate = ({ ...props }) => {
       />
       <div className="mt-6">
         <div className="mt-6">
-          {/* <DataTable data={data.users} columns={columns}/> */}
           <TanTableCustom
             columns={columns}
             data={props?.data?.events || []}
@@ -148,7 +146,6 @@ const EventsPageTemplate = ({ ...props }) => {
             filteredBy="name"
             placeholder="Filter Event"
           />
-          {/* <TableSource data={data?.users} tableConfig={tableConfig} /> */}
         </div>
       </div>
     </div>

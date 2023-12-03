@@ -12,19 +12,22 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import Image from "next/image";
 import { TanTableCustom } from "@/components/molecules/TanTableCustom";
 import { format } from "date-fns";
 import { useState } from "react";
 import { DialogDemo } from "@/components/atoms/Modal";
 import fetchingData from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const BlogPageTemplate = ({ ...props }) => {
+const BlogCategoryTemplate = ({ ...props }) => {
   const router = useRouter();
   const [state, setState] = useState({
+    type: "CREATED",
     modal: false,
-    idBlog: "",
-    data: props?.data?.data || [],
+    idCategory: "",
+    categoryValue: "",
+    data: props?.data || [],
   });
 
   const columns = [
@@ -49,53 +52,18 @@ const BlogPageTemplate = ({ ...props }) => {
       enableHiding: false,
     },
     {
-      header: "Title",
-      accessorKey: "title",
-    },
-    {
-      header: "Slug",
-      accessorKey: "slug",
-    },
-    {
-      header: "Author",
-      accessorKey: "author",
-      cell: ({ row }) => {
-        const events = row.original;
-
-        return (
-          <div className="relative">
-            <span>{events.author.name}</span>
-          </div>
-        );
-      },
-    },
-    {
-      header: "Image",
-      accessorKey: "image",
-      cell: ({ row }) => {
-        const events = row.original;
-
-        return (
-          <div className="relative">
-            <Image
-              alt="image-banner"
-              src={events.image}
-              width={150}
-              height={150}
-            />
-          </div>
-        );
-      },
+      header: "Name",
+      accessorKey: "name",
     },
     {
       header: "Created at",
-      accessorKey: "published_at",
+      accessorKey: "created_at",
       cell: ({ row }) => {
         const events = row.original;
 
         return (
-          <div className="relative">
-            <span>{format(new Date(events.published_at), "dd MMMM yyyy")}</span>
+          <div>
+            <span>{format(new Date(events.created_at), "dd MMMM yyyy")}</span>
           </div>
         );
       },
@@ -118,19 +86,28 @@ const BlogPageTemplate = ({ ...props }) => {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push({
-                    pathname: `/blog/edit/${events.slug}/${events.id}`,
+                  setState({
+                    ...state,
+                    modal: !state.modal,
+                    type: "EDIT",
+                    categoryValue: events.name,
+                    idCategory: events.id,
                   })
                 }
               >
-                Edit Blog
+                Edit Category
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  setState({...state, modal: !state.modal, idBlog: events.id })
+                  setState({
+                    ...state,
+                    type: "DELETE",
+                    modal: !state.modal,
+                    idCategory: events.id,
+                  })
                 }
               >
-                Delete Blog
+                Delete Category
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -139,26 +116,48 @@ const BlogPageTemplate = ({ ...props }) => {
     },
   ];
 
-  const handleRedirect = () => {
-    router.push("/blog/create");
-  };
-
-  const handleDelete = async () => {
+  const handleUpdateData = async () => {
     let req;
     try {
+      let urlReq;
+      let method;
+
+      if (state.type === "CREATED") {
+        urlReq = `/admin/blog/category/add`;
+        method = "POST";
+      } else if (state.type === "EDIT") {
+        urlReq = `/admin/blog/category/edit`;
+        method = "PUT";
+      } else {
+        urlReq = `/admin/blog/category/delete/${state.idCategory}`;
+        method = "DELETE";
+      }
+
+      const payloadEdit = {
+        id: state.idCategory,
+        name: state.categoryValue,
+      };
+
+      const payloadCreated = {
+        category_name: state.categoryValue,
+      };
+
       req = await fetchingData({
-        url: `/admin/blog/delete`,
-        body: {
-          id: state.idBlog,
-        },
-        method: "DELETE",
+        url: urlReq,
+        body:
+          state.type === "EDIT"
+            ? payloadEdit
+            : state.type === "CREATED"
+            ? payloadCreated
+            : undefined,
+        method: method,
       });
 
       const updatedData = await fetchingData({
-        url: `/admin/blog/list?page=${props.data?.page}&per_page=${props?.data?.per_page}`, // Replace with your API endpoint to fetch the data
+        url: `/admin/blog/category/list?page=${props.data?.page}&per_page=${props?.data?.per_page}`, // Replace with your API endpoint to fetch the data
         method: "GET",
       });
-      setState({ ...state, modal: !state.modal, data: updatedData.data });
+      setState({ ...state, modal: !state.modal, data: updatedData });
     } catch (error) {
       return error;
     }
@@ -169,16 +168,39 @@ const BlogPageTemplate = ({ ...props }) => {
       <DialogDemo
         open={state.modal}
         onOpenChange={() => setState({ ...state, modal: !state.modal })}
-        onSubmit={handleDelete}
-        title="Delete Blog"
+        onSubmit={handleUpdateData}
+        title={
+          state.type === "EDIT"
+            ? "Edit Category"
+            : state.type === "CREATED"
+            ? "Create Category"
+            : "Delete Category"
+        }
       >
-        <span>Are you sure want delete selected Blog ?</span>
+        {state.type === "DELETE" ? (
+          <>
+            <span>Are you sure want to delete selected Cateogry ?</span>
+          </>
+        ) : (
+          <>
+            <Label>Category</Label>
+            <Input
+              value={state.categoryValue}
+              onChange={(e) =>
+                setState({
+                  ...state,
+                  categoryValue: e.target.value,
+                })
+              }
+            />
+          </>
+        )}
       </DialogDemo>
       <TitlePage
-        title="Blog"
+        title="Blog Category"
         buttonCreate
-        titleButton="Create Blog"
-        onClickButton={handleRedirect}
+        titleButton="Create Blog Category"
+        onClickButton={() => setState({ ...state, modal: !state.modal })}
       />
       <div className="mt-6">
         <TanTableCustom
@@ -190,11 +212,12 @@ const BlogPageTemplate = ({ ...props }) => {
           page={props.data?.page}
           totalPages={props?.data?.total_pages}
           filteredBy="title"
-          placeholder="Filter Blog"
+          placeholder="Filter Blog Category"
+          searchFilter={false}
         />
       </div>
     </div>
   );
 };
 
-export default BlogPageTemplate;
+export default BlogCategoryTemplate;

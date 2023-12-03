@@ -16,30 +16,80 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { UploadImage } from "@/components/molecules/UploadImage";
+import { useToast } from "@/components/ui/use-toast";
+import fetchingData from "@/lib/api";
+import { useRouter } from "next/router";
 
 const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
+  banner_image: z.any(),
+  type: z.enum(["url", "non-url"]),
+  value: z
+    .string()
+    .min(1, "URL is required")
+    .refine(
+      (value) => /^(ftp|http|https):\/\/[^ "]+$/.test(value),
+      "Invalid URL"
+    ),
 });
 
 const FormBanner = ({ ...props }) => {
+  const { toast } = useToast();
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: "",
+      type: "url",
+      banner_image: null,
+      value: "",
     },
   });
 
-  function onSubmit(data) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data) {
+    let req;
+    try {
+      const formData = new FormData();
+      const payload = {
+        type: data.type,
+        value: data.value,
+      };
+      formData.append("payload", JSON.stringify(payload));
+      formData.append("banner_image", data.banner_image[0].file);
+
+      req = await fetchingData({
+        url: "/admin/banner/add",
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      }).then((res) => {
+        if (res.status === 200) {
+          toast({
+            title: "Success submit Banner",
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+            description: res?.message,
+          });
+          router.push("/banner");
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Some thing went wrong",
+            description: res?.message,
+          });
+        }
+      });
+    } catch {}
   }
 
   return (
@@ -52,30 +102,61 @@ const FormBanner = ({ ...props }) => {
           <TitlePage title={props.isEdit ? "Edit Banner" : "Create Banner"} />
           <FormField
             control={form.control}
-            name="username"
+            name="type"
             render={({ field }) => (
               <FormItem className="flex flex-col gap-2">
-                <FormLabel>Slug Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-
-                <FormLabel>Image</FormLabel>
-                <FormControl>
-                  <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-
                 <FormLabel>Type</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                    className="w-full"
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="url">URL</SelectItem>
+                        <SelectItem value="image">Image</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                <FormLabel>Url Redirect</FormLabel>
+          <FormField
+            control={form.control}
+            name="value"
+            render={({ field, fieldState: { error } }) => (
+              <FormItem className="flex flex-col gap-2">
+                <FormLabel>Url Redirection</FormLabel>
                 <FormControl>
                   <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage error={error} />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="banner_image"
+            render={({ field }) => (
+              <FormItem className="flex flex-col gap-2">
+                <FormLabel>Image</FormLabel>
+                <FormControl>
+                  <UploadImage
+                    isEdit={props.isEdit}
+                    onImageUploadFile={(value) => {
+                      // handleImageUpload("eventMapFile", value);
+                      field.onChange(value);
+                    }}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
