@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import QrReader from 'react-qr-scanner'
 import { Input } from "@/components/ui/input";
-import { useReducer, useContext } from "react";
+import { useReducer, useContext, useCallback } from "react";
 import fetchingData from "@/lib/api";
 
 
@@ -22,9 +22,9 @@ import { createMachine, assign, fromPromise } from 'xstate';
 const checkTicketValidity = async (ticketId) => {
     const url = `/admin/transaction/view/${ticketId}`;
     try {
-        const response = await fetchingData({url});
+        const response = await fetchingData({ url });
         const isValid = response.data.order_detail.order_status === 'paid';
-        return { valid: isValid };
+        return { valid: isValid, order_detail: response.data.order_detail };
     } catch (error) {
         throw error;
     }
@@ -34,15 +34,17 @@ const ticketMachine = createMachine({
     id: 'ticket',
     initial: 'scanning',
     context: {
-        ticketId : ""
+        ticketId: ""
     },
     states: {
         scanning: {
             on: {
                 FOUND: {
                     target: 'scannedFound',
-                    actions: assign({ ticketId: (data) => {
-                        return data?.event?.payload}
+                    actions: assign({
+                        ticketId: (data) => {
+                            return data?.event?.payload
+                        }
 
                     })
                 },
@@ -65,7 +67,8 @@ const ticketMachine = createMachine({
                         target: 'scannedValid',
                         guard: (result) => {
                             return result.event.output.valid;
-                        }
+                        },
+                        actions: assign({ ticketDetail: ({ event }) => event.output }),
                     },
                     {
                         target: 'scannedInvalid',
@@ -100,48 +103,16 @@ const ticketMachine = createMachine({
 
 const TicketContext = React.createContext();
 
-const initialState = {
-    ticketId: "",
-    manualCheckIn: "",
-    ticketInfo: null
-};
-
-const reducer = (state, action) => {
-    switch (action.type) {
-        case 'SET_TICKET_ID':
-            return { ...state, ticketId: action.payload };
-        case 'SET_MANUAL_CHECK_IN':
-            return { ...state, manualCheckIn: action.payload };
-        case 'SET_TICKET_INFO':
-            return { ...state, ticketInfo: action.payload };
-        default:
-            throw new Error();
-    }
-};
-
-
 export const VerifyTicketModal = ({ children, ...props }) => {
 
-    // const [state, dispatch] = useReducer(reducer, initialState);
     const [fsm, send] = useMachine(ticketMachine);
 
-    const handleScan = data => {
+    const handleScan = useCallback((data) => {
         if (data) {
             send({ type: 'FOUND', payload: data?.text });
         }
-    }
-
-    const handleManualCheckIn = () => {
-
-    }
-
-    const handleError = err => {
-        console.error(err);
-    }
-
-    const handleApprove = () => {
-        // Handle ticket approval logic here
-    };
+    }, []);
+    const handleError = useCallback(() => { }, []);
 
     return (
         <TicketContext.Provider value={{ fsm, send }}>
@@ -149,11 +120,10 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                 <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
                     <DialogHeader>
                         <DialogTitle>Verify Ticket </DialogTitle>
-                        <p>Current State: {fsm.value}</p>
-                        <p>Ticket ID: {fsm.context.ticketId}</p>
+                        {/* <p>Current State: {fsm.value}</p> */}
                     </DialogHeader>
                     <div className="grid grid-cols-2 gap-4">
-                        <QrCodePanelMemoized handleError={()=>{}} handleScan={handleScan} />
+                        <QrCodePanelMemoized handleError={handleError} handleScan={handleScan} />
                         <TicketInfo />
                     </div>
                 </DialogContent>
@@ -163,32 +133,87 @@ export const VerifyTicketModal = ({ children, ...props }) => {
 };
 
 const TicketInfo = () => {
-    const { state } = useContext(TicketContext);
+    const { fsm, send } = useContext(TicketContext);
     return <div className="bg-white shadow-sm rounded  flex flex-col">
-        <div className="mb-4 p-3 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-2">Ticket Details</h2>
-            <div className="grid grid-cols-2 gap-4 text-gray-700 text-md">
-                <div className="bg-gray-100 p-2 rounded">Event</div>
-                <div className="bg-gray-200 p-2 rounded">{state?.ticketId}</div>
-                <div className="bg-gray-100 p-2 rounded">Holder</div>
-                <div className="bg-gray-200 p-2 rounded">John Doe</div>
-                <div className="bg-gray-100 p-2 rounded">Price</div>
-                <div className="bg-gray-200 p-2 rounded">$100</div>
-                <div className="bg-gray-100 p-2 rounded">Status</div>
-                <div className="bg-gray-200 p-2 rounded">Valid</div>
+        <div className="h-full mb-4 p-3 bg-white rounded-lg shadow-md flex items-center">
+            <div className="m-auto">
+                {/* <div className="bg-gray-100 p-2 rounded">FSM Context</div> */}
+                {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.context)}</div> */}
+                {fsm.value === 'scanning' && (
+                    <div className="flex justify-center items-center w-full">
+                        <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
+                    </div>
+                )}
+                {fsm.value === 'scannedFound' && (
+                    <div className="flex justify-center items-center w-full">
+                        <h2 className="text-center text-xl font-semibold">Ticket Verification in progress...</h2>
+                    </div>
+                )}
+                {fsm.value === 'scannedValid' && (
+                    <>
+                        <h2 className="text-2xl font-semibold text-gray-700 mb-2">Ticket Details</h2>
+                        <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${fsm.context.ticketDetail.order_detail.order_status === 'paid' ? 'bg-green-200' : ''}`}>
+                                <span className="font-semibold text-xl">Order Status:</span>
+                                <span className="text-xl">{fsm.context.ticketDetail.order_detail.order_status}</span>
+                            </div>    
+                        <div className="flex flex-col bg-gray-100 p-4 rounded-lg shadow-md">
+                        
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Order ID:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.order_id}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Invoice ID:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.invoice_id}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Total Price:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.total_price}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Order Date:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.order_date}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Payment Method:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.payment_method}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">User ID:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.user_id}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">User First Name:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.user_first_name}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">User Last Name:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.user_last_name}</span>
+                            </div>
+                            <div className="flex justify-between mb-2">
+                                <span className="font-semibold">User Email:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.user_email}</span>
+                            </div>
+                        </div>
+                        <div className="flex mt-4 items-center justify-end">
+                            <Button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => send({ type: "RESUME" })}>
+                                Rescan
+                            </Button>
+                            <Button className="ml-2  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" >
+                                Approve
+                            </Button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
-        <div className="flex mr-4 items-center justify-end">
-            <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" >
-                Approve
-            </Button>
-        </div>
+
     </div>;
 }
 
 
 const QrCodePanel = ({ handleError, handleScan, manualCheckIn, setManualCheckIn, handleManualCheckIn }) => {
-    const { state, dispatch } = useContext(TicketContext);
+    const { fsm, send } = useContext(TicketContext);
     return <div className="bg-gray-800 shadow-sm rounded px-4 pt-4 pb-4 mb-4 flex flex-col">
         <QrReader
             delay={300}
