@@ -144,6 +144,11 @@ const TicketInfo = () => {
                         <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
                     </div>
                 )}
+                {fsm.value === 'scannedInvalid' && (
+                    <div className="flex justify-center items-center w-full">
+                        <h2 className="text-center text-xl font-semibold">Invalid QR code. Please try again.</h2>
+                    </div>
+                )}
                 {fsm.value === 'scannedFound' && (
                     <div className="flex justify-center items-center w-full">
                         <h2 className="text-center text-xl font-semibold">Ticket Verification in progress...</h2>
@@ -197,7 +202,7 @@ const TicketInfo = () => {
                                 Rescan
                             </Button>
                             <Button className="ml-2  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" >
-                                Approve
+                                Collect Ticket
                             </Button>
                         </div>
                     </>
