@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
     Dialog,
@@ -10,6 +12,91 @@ import { Button } from "@/components/ui/button";
 import QrReader from 'react-qr-scanner'
 import { Input } from "@/components/ui/input";
 import { useReducer, useContext } from "react";
+import fetchingData from "@/lib/api";
+
+
+import { useMachine } from '@xstate/react';
+import { createMachine, assign, fromPromise } from 'xstate';
+
+
+const checkTicketValidity = async (ticketId) => {
+    const url = `/admin/transaction/view/${ticketId}`;
+    try {
+        const response = await fetchingData({url});
+        const isValid = response.data.order_detail.order_status === 'paid';
+        return { valid: isValid };
+    } catch (error) {
+        throw error;
+    }
+}
+
+const ticketMachine = createMachine({
+    id: 'ticket',
+    initial: 'scanning',
+    context: {
+        ticketId : ""
+    },
+    states: {
+        scanning: {
+            on: {
+                FOUND: {
+                    target: 'scannedFound',
+                    actions: assign({ ticketId: (data) => {
+                        return data?.event?.payload}
+
+                    })
+                },
+                NOT_FOUND: 'scannedNotFound'
+            }
+        },
+        scannedFound: {
+            on: {
+                RESUME: 'scanning'
+            },
+            invoke: {
+                src: fromPromise((context) => {
+                    return checkTicketValidity(context.input.ticketId);
+                }),
+                input: ({ context }) => {
+                    return { ticketId: context.ticketId };
+                },
+                onDone: [
+                    {
+                        target: 'scannedValid',
+                        guard: (result) => {
+                            return result.event.output.valid;
+                        }
+                    },
+                    {
+                        target: 'scannedInvalid',
+                        guard: (result) => {
+                            return !result.event.output.valid;
+                        }
+                    }
+                ],
+                onError: {
+                    target: 'scannedInvalid',
+                    // actions: (_, event) => console.error(event.data)
+                }
+            }
+        },
+        scannedNotFound: {
+            on: {
+                RESUME: 'scanning'
+            }
+        },
+        scannedValid: {
+            on: {
+                RESUME: 'scanning'
+            }
+        },
+        scannedInvalid: {
+            on: {
+                RESUME: 'scanning'
+            }
+        }
+    }
+});
 
 const TicketContext = React.createContext();
 
@@ -35,11 +122,12 @@ const reducer = (state, action) => {
 
 export const VerifyTicketModal = ({ children, ...props }) => {
 
-    const [state, dispatch] = useReducer(reducer, initialState);
+    // const [state, dispatch] = useReducer(reducer, initialState);
+    const [fsm, send] = useMachine(ticketMachine);
 
     const handleScan = data => {
         if (data) {
-            dispatch({ type: 'SET_TICKET_ID', payload: "test" });
+            send({ type: 'FOUND', payload: data?.text });
         }
     }
 
@@ -56,14 +144,16 @@ export const VerifyTicketModal = ({ children, ...props }) => {
     };
 
     return (
-        <TicketContext.Provider value={{ state, dispatch }}>
+        <TicketContext.Provider value={{ fsm, send }}>
             <Dialog open={props.open} onOpenChange={props.onOpenChange}>
                 <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
                     <DialogHeader>
-                        <DialogTitle>Verify Ticket</DialogTitle>
+                        <DialogTitle>Verify Ticket </DialogTitle>
+                        <p>Current State: {fsm.value}</p>
+                        <p>Ticket ID: {fsm.context.ticketId}</p>
                     </DialogHeader>
                     <div className="grid grid-cols-2 gap-4">
-                        <QrCodePanelMemoized handleScan={handleScan} />
+                        <QrCodePanelMemoized handleError={()=>{}} handleScan={handleScan} />
                         <TicketInfo />
                     </div>
                 </DialogContent>
