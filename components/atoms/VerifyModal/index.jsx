@@ -192,7 +192,7 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                         </table>
                     </div>
                     <div className="flex justify-end mt-4">
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => send({ type: "COLLECT" })}>Collect</button>
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => send({ type: "COLLECT" })}>Confirm</button>
                         <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => send({ type: "CLOSE" })}>Cancel</button>
                     </div>
                 </DialogContent>
@@ -278,7 +278,7 @@ const TicketInfo = () => {
                                 Rescan
                             </Button>
                             <Button className="ml-2  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => send({ type: "COLLECTING" })} type="submit" >
-                                Collect Ticket
+                                Distribute Ticket
                             </Button>
                         </div>
                     </>
