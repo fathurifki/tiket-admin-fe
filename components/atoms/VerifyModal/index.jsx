@@ -293,7 +293,7 @@ const TicketInfo = () => {
 const QrCodePanel = ({ handleError, handleScan, handleManualCheckIn }) => {
     const { fsm, send } = useContext(TicketContext);
     const [manualCheckIn, setManualCheckIn] = useState("");
-    return <div className="bg-gray-800 shadow-sm rounded px-4 pt-4 pb-4 mb-4 flex flex-col">
+    return <div className=" shadow-md rounded px-4 pt-4 pb-4 mb-4 flex flex-col">
         <QrReader
             delay={300}
             onError={handleError}
