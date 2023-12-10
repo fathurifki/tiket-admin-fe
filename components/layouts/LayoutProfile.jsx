@@ -42,9 +42,9 @@ function Sidebar({ menuItems }) {
         </div>
         <div className="flex flex-col gap-8 p-2 h-full lg:items-start md:items-center">
           {menuItems.map((item, index) => (
-            <>
+            <React.Fragment key={`menu_${index}`}>
               {item.children ? (
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion key={`acc_${index}`} type="single" collapsible className="w-full">
                   <AccordionItem value="item-1">
                     <AccordionTrigger className="text-xl">
                       <div className="flex items-center gap-6">
@@ -56,7 +56,7 @@ function Sidebar({ menuItems }) {
                       {item.children.map((v, childIndex) => (
                         <Link
                           href={v.href}
-                          key={childIndex}
+                          key={`child_${childIndex}`}
                           className="text-xl"
                         >
                           <div className="flex items-center gap-6 py-2">
@@ -69,14 +69,14 @@ function Sidebar({ menuItems }) {
                   </AccordionItem>
                 </Accordion>
               ) : (
-                <Link href={item.href} key={index} className="text-xl">
+                <Link href={item.href} key={`link_${index}`} className="text-xl">
                   <div className="flex items-center gap-6">
                     <div>{item.icon}</div>
                     <div className="hidden lg:block">{item.label}</div>
                   </div>
                 </Link>
               )}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
