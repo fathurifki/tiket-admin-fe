@@ -152,12 +152,21 @@ const TicketInfo = () => {
                 {fsm.value === 'scannedValid' && (
                     <>
                         <h2 className="text-2xl font-semibold text-gray-700 mb-2">Ticket Details</h2>
-                        <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${fsm.context.ticketDetail.order_detail.order_status === 'paid' ? 'bg-green-200' : ''}`}>
-                                <span className="font-semibold text-xl">Order Status:</span>
-                                <span className="text-xl">{fsm.context.ticketDetail.order_detail.order_status}</span>
-                            </div>    
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${fsm.context.ticketDetail.order_detail.order_status === 'paid' ? 'bg-green-200' : ''}`}>
+                                <span className="font-semibold text-md">Order Status:</span>
+                                <span className="text-md">{fsm.context.ticketDetail.order_detail.order_status}</span>
+                            </div>
+                            <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${fsm.context.ticketDetail.order_detail.ticket_collected ? 'bg-green-200' : 'bg-red-200'}`}>
+                                <span className="font-semibold text-md">Ticket Collected:</span>
+                                <span className="text-md">{fsm.context.ticketDetail.order_detail.ticket_collected ? '✓' : '✗'}</span>
+                            </div>
+                        </div>
                         <div className="flex flex-col bg-gray-100 p-4 rounded-lg shadow-md">
-                        
+                        <div className="flex justify-between mb-2">
+                                <span className="font-semibold">Name:</span>
+                                <span>{fsm.context.ticketDetail.order_detail.user_first_name} {fsm.context.ticketDetail.order_detail.user_last_name}</span>
+                            </div>
                             <div className="flex justify-between mb-2">
                                 <span className="font-semibold">Order ID:</span>
                                 <span>{fsm.context.ticketDetail.order_detail.order_id}</span>
@@ -172,23 +181,11 @@ const TicketInfo = () => {
                             </div>
                             <div className="flex justify-between mb-2">
                                 <span className="font-semibold">Order Date:</span>
-                                <span>{fsm.context.ticketDetail.order_detail.order_date}</span>
+                                <span>{new Date(fsm.context.ticketDetail.order_detail.order_date).toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <span className="font-semibold">Payment Method:</span>
                                 <span>{fsm.context.ticketDetail.order_detail.payment_method}</span>
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">User ID:</span>
-                                <span>{fsm.context.ticketDetail.order_detail.user_id}</span>
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">User First Name:</span>
-                                <span>{fsm.context.ticketDetail.order_detail.user_first_name}</span>
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">User Last Name:</span>
-                                <span>{fsm.context.ticketDetail.order_detail.user_last_name}</span>
                             </div>
                             <div className="flex justify-between mb-2">
                                 <span className="font-semibold">User Email:</span>
@@ -224,7 +221,7 @@ const QrCodePanel = ({ handleError, handleScan, manualCheckIn, setManualCheckIn,
             <Input
                 value={manualCheckIn}
                 onChange={(e) => setManualCheckIn(e.target.value)}
-                placeholder="Manual Check In"
+                placeholder="Manual Verification"
                 onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                         handleManualCheckIn();
