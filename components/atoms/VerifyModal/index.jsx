@@ -89,8 +89,20 @@ const ticketMachine = createMachine({
             }
         },
         scannedValid: {
-            on: {
-                RESUME: 'scanning'
+            initial: "idle",
+            states: {
+                idle: {
+                    on: {
+                        RESUME: '#ticket.scanning',
+                        COLLECTING: 'collecting'
+                    }
+                },
+                scanning: {},
+                collecting: {
+                    on: {
+                        CLOSE: "idle"
+                    }
+                }
             }
         },
         scannedInvalid: {
@@ -128,6 +140,39 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                     </div>
                 </DialogContent>
             </Dialog>
+            <Dialog open={fsm.value?.scannedValid === 'collecting'} onOpenChange={(open) => { console.log(open); send({ type: "CLOSE" }); }}>
+            <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
+                <DialogHeader>
+                    <DialogTitle>Collect Ticket </DialogTitle>
+                </DialogHeader>               
+                    <p>Please provide the following quantity of tickets:</p>
+                    <div className="grid grid-cols-1 gap-4">
+                        {fsm?.context?.ticketDetail?.order_detail?.orders.map((order, index) => (
+                            <div key={index} className="bg-white shadow-sm rounded p-4 flex flex-col">
+                                <h2 className="text-xl font-semibold mb-2">{order.order_event_name}</h2>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex justify-between mb-2">
+                                        <span className="font-semibold text-md">Package Type:</span>
+                                        <span className="text-md">{order.order_package_type}</span>
+                                    </div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="font-semibold text-md">Quantity:</span>
+                                        <span className="text-md">{order.order_item_quantity}</span>
+                                    </div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="font-semibold text-md">Price:</span>
+                                        <span className="text-md">{order.order_item_price}</span>
+                                    </div>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="font-semibold text-md">Status:</span>
+                                        <span className="text-md">{order.order_item_status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </TicketContext.Provider>
     );
 };
@@ -139,7 +184,13 @@ const TicketInfo = () => {
             <div className="m-auto">
                 {/* <div className="bg-gray-100 p-2 rounded">FSM Context</div> */}
                 {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.context)}</div> */}
-                {fsm.value === 'scanning' && (
+                <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.value)}</div>
+                {fsm.value === 'scanning'  && (
+                    <div className="flex justify-center items-center w-full">
+                        <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
+                    </div>
+                )}
+                {fsm.value?.scannedValid === 'scanning' && (
                     <div className="flex justify-center items-center w-full">
                         <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
                     </div>
@@ -154,7 +205,7 @@ const TicketInfo = () => {
                         <h2 className="text-center text-xl font-semibold">Ticket Verification in progress...</h2>
                     </div>
                 )}
-                {fsm.value === 'scannedValid' && (
+                {fsm.value?.scannedValid === "idle" && (
                     <>
                         <h2 className="text-2xl font-semibold text-gray-700 mb-2">Ticket Details</h2>
                         <div className="grid grid-cols-2 gap-4">
@@ -168,7 +219,7 @@ const TicketInfo = () => {
                             </div>
                         </div>
                         <div className="flex flex-col bg-gray-100 p-4 rounded-lg shadow-md">
-                        <div className="flex justify-between mb-2">
+                            <div className="flex justify-between mb-2">
                                 <span className="font-semibold">Name:</span>
                                 <span>{fsm.context.ticketDetail.order_detail.user_first_name} {fsm.context.ticketDetail.order_detail.user_last_name}</span>
                             </div>
@@ -201,7 +252,7 @@ const TicketInfo = () => {
                             <Button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => send({ type: "RESUME" })}>
                                 Rescan
                             </Button>
-                            <Button className="ml-2  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" >
+                            <Button className="ml-2  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => send({ type: "COLLECTING" })} type="submit" >
                                 Collect Ticket
                             </Button>
                         </div>
