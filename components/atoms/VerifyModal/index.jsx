@@ -148,7 +148,7 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                     <p>Please provide the following quantity of tickets:</p>
                     <h2 className="text-xl font-semibold mb-2">{fsm?.context?.ticketDetail?.order_detail?.orders[0]?.order_event_name}</h2>
                     <div className="grid grid-cols-1 gap-4">
-                        <table className="min-w-full divide-y divide-gray-200">
+                        <table className="min-w-full divide-y divide-gray-200 border border-gray-300 shadow-lg rounded">
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -161,12 +161,12 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {fsm?.context?.ticketDetail?.order_detail?.orders.map((order, index) => (
-                                    <tr key={index}>
+                                    <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : ""}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{order.order_package_type}</div>
+                                            <div className="text-lg text-gray-900 font-bold">{order.order_package_type}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{order.order_item_quantity}</div>
+                                            <div className="text-lg text-gray-900 font-bold">{order.order_item_quantity}</div>
                                         </td>
                                     </tr>
                                 ))}
