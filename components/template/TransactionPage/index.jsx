@@ -14,10 +14,18 @@ import {
 import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/router";
+import { VerifyTicketModal } from "@/components/atoms/VerifyModal";
+import { useState } from "react";
 
 const TransactionsPageTemplate = ({ ...props }) => {
   const router = useRouter();
+  const [state, setState] = useState({
+    modal: false,
+    idBanner: "",
+    data: props?.data?.data || [],
+  });
 
+  
   const columns = [
     {
       id: "select",
@@ -135,6 +143,11 @@ const TransactionsPageTemplate = ({ ...props }) => {
         buttonCreate
         titleButton="Verify Transaction"
         title="Transactions"
+        onClickButton={() => setState({ ...state, modal: true })}
+      />
+      <VerifyTicketModal
+        open={state.modal}
+        onOpenChange={(isOpen) => setState({ ...state, modal: isOpen })}
       />
       <div className="mt-6">
         <div className="mt-6">
@@ -148,7 +161,6 @@ const TransactionsPageTemplate = ({ ...props }) => {
             handleSearchValue={(value) => props.handleSearchValue(value)}
             page={props.data?.page}
             totalPages={props?.data?.total_pages}
-            filteredBy="name"
             placeholder="Filter Transactions"
           />
         </div>
