@@ -62,7 +62,7 @@ export const VerifyTicketModal = ({children, ...props}) => {
                   }
                 }}
               />
-              <Button className="ml-4" onClick={handleManualCheckIn}>Check In</Button>
+              <Button className="ml-4" onClick={handleManualCheckIn}>Verify Ticket</Button>
             </div>
           </div>
           <div>
