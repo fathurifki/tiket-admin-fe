@@ -299,7 +299,7 @@ const QrCodePanel = ({ handleError, handleScan, handleManualCheckIn }) => {
             onError={handleError}
             onScan={handleScan}
             style={{ width: '100%' }} />
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center mt-4 animate-slide">
             <Input
                 value={manualCheckIn}
                 onChange={(e) => setManualCheckIn(e.target.value)}
