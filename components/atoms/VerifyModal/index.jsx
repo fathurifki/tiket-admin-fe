@@ -146,30 +146,36 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                     <DialogTitle>Collect Ticket </DialogTitle>
                 </DialogHeader>               
                     <p>Please provide the following quantity of tickets:</p>
+                    <h2 className="text-xl font-semibold mb-2">{fsm?.context?.ticketDetail?.order_detail?.orders[0]?.order_event_name}</h2>
                     <div className="grid grid-cols-1 gap-4">
-                        {fsm?.context?.ticketDetail?.order_detail?.orders.map((order, index) => (
-                            <div key={index} className="bg-white shadow-sm rounded p-4 flex flex-col">
-                                <h2 className="text-xl font-semibold mb-2">{order.order_event_name}</h2>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="flex justify-between mb-2">
-                                        <span className="font-semibold text-md">Package Type:</span>
-                                        <span className="text-md">{order.order_package_type}</span>
-                                    </div>
-                                    <div className="flex justify-between mb-2">
-                                        <span className="font-semibold text-md">Quantity:</span>
-                                        <span className="text-md">{order.order_item_quantity}</span>
-                                    </div>
-                                    <div className="flex justify-between mb-2">
-                                        <span className="font-semibold text-md">Price:</span>
-                                        <span className="text-md">{order.order_item_price}</span>
-                                    </div>
-                                    <div className="flex justify-between mb-2">
-                                        <span className="font-semibold text-md">Status:</span>
-                                        <span className="text-md">{order.order_item_status}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Package Type
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Quantity
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {fsm?.context?.ticketDetail?.order_detail?.orders.map((order, index) => (
+                                    <tr key={index}>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">{order.order_package_type}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">{order.order_item_quantity}</div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => send({ type: "COLLECT" })}>Collect</button>
+                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => send({ type: "CLOSE" })}>Cancel</button>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -184,7 +190,7 @@ const TicketInfo = () => {
             <div className="m-auto">
                 {/* <div className="bg-gray-100 p-2 rounded">FSM Context</div> */}
                 {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.context)}</div> */}
-                <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.value)}</div>
+                {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.value)}</div> */}
                 {fsm.value === 'scanning'  && (
                     <div className="flex justify-center items-center w-full">
                         <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
