@@ -116,7 +116,7 @@ const TransactionsPageTemplate = ({ ...props }) => {
                   })
                 }
               >
-                Edit Transactions
+                Transaction Detail
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -132,6 +132,8 @@ const TransactionsPageTemplate = ({ ...props }) => {
   return (
     <div className="h-full">
       <TitlePage
+        buttonCreate
+        titleButton="Verify Transaction"
         title="Transactions"
       />
       <div className="mt-6">
