@@ -175,8 +175,10 @@ const FormEvents = ({ ...props }) => {
 
   const formatTimeServer = (date, time) => {
     if (time) {
-      const formattedTime = `${date}T${time.hours}:${time.minutes}:00Z`;
-      return formattedTime;
+      const formattedTime = `${date} ${time.hours}:${time.minutes}`;
+      const resdate = new Date(formattedTime);
+
+      return resdate.toISOString();
     }
     return null;
   };
