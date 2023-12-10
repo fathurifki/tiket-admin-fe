@@ -106,8 +106,8 @@ const ticketMachine = createMachine({
             }
         },
         scannedInvalid: {
-            on: {
-                RESUME: 'scanning'
+            after: {
+                2000: 'scanning'
             }
         }
     }
@@ -141,10 +141,10 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                 </DialogContent>
             </Dialog>
             <Dialog open={fsm.value?.scannedValid === 'collecting'} onOpenChange={(open) => { console.log(open); send({ type: "CLOSE" }); }}>
-            <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
-                <DialogHeader>
-                    <DialogTitle>Collect Ticket </DialogTitle>
-                </DialogHeader>               
+                <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Collect Ticket </DialogTitle>
+                    </DialogHeader>
                     <p>Please provide the following quantity of tickets:</p>
                     <h2 className="text-xl font-semibold mb-2">{fsm?.context?.ticketDetail?.order_detail?.orders[0]?.order_event_name}</h2>
                     <div className="grid grid-cols-1 gap-4">
@@ -191,7 +191,7 @@ const TicketInfo = () => {
                 {/* <div className="bg-gray-100 p-2 rounded">FSM Context</div> */}
                 {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.context)}</div> */}
                 {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.value)}</div> */}
-                {fsm.value === 'scanning'  && (
+                {fsm.value === 'scanning' && (
                     <div className="flex justify-center items-center w-full">
                         <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
                     </div>
@@ -271,8 +271,9 @@ const TicketInfo = () => {
 }
 
 
-const QrCodePanel = ({ handleError, handleScan, manualCheckIn, setManualCheckIn, handleManualCheckIn }) => {
+const QrCodePanel = ({ handleError, handleScan, handleManualCheckIn }) => {
     const { fsm, send } = useContext(TicketContext);
+    const [manualCheckIn, setManualCheckIn] = useState("");
     return <div className="bg-gray-800 shadow-sm rounded px-4 pt-4 pb-4 mb-4 flex flex-col">
         <QrReader
             delay={300}
@@ -286,10 +287,10 @@ const QrCodePanel = ({ handleError, handleScan, manualCheckIn, setManualCheckIn,
                 placeholder="Manual Verification"
                 onKeyPress={(e) => {
                     if (e.key === 'Enter') {
-                        handleManualCheckIn();
+                        send({ type: 'FOUND', payload: manualCheckIn });
                     }
                 }} />
-            <Button className="ml-4 bg-blue-200 hover:bg-blue-300 text-black font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleManualCheckIn}>Verify Ticket</Button>
+            <Button className="ml-4 bg-blue-200 hover:bg-blue-300 text-black font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline" onClick={()=> send({ type: 'FOUND', payload: manualCheckIn })}>Verify Ticket</Button>
         </div>
     </div>;
 }
