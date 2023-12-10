@@ -44,7 +44,7 @@ export const VerifyTicketModal = ({children, ...props}) => {
           <DialogTitle>Verify Ticket</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
-          <div>
+        <div className="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
             <QrReader
               delay={300}
               onError={handleError}
@@ -62,23 +62,27 @@ export const VerifyTicketModal = ({children, ...props}) => {
                   }
                 }}
               />
-              <Button className="ml-4" onClick={handleManualCheckIn}>Verify Ticket</Button>
+              <Button className="ml-4 bg-blue-200 hover:bg-blue-300 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleManualCheckIn}>Verify Ticket</Button>
             </div>
           </div>
-          <div>
-            <h2>Ticket Details</h2>
-            <p>Event: Dummy Event</p>
-            <p>Holder: John Doe</p>
-            <p>Price: $100</p>
-            <p>Status: Valid</p>
+          <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+            <div className="mb-4">
+              <h2 className="font-bold text-2xl mb-2">Ticket Details</h2>
+              <p className="text-gray-700 text-base">Event: Dummy Event</p>
+              <p className="text-gray-700 text-base">Holder: John Doe</p>
+              <p className="text-gray-700 text-base">Price: $100</p>
+              <p className="text-gray-700 text-base">Status: Valid</p>
+            </div>
             {ticketInfo && (
-              <div>
+              <div className="mb-4">
                 {/* Display ticket info here */}
               </div>
             )}
-            <Button className="bg-red-400 mt-4" type="submit" onClick={handleApprove}>
-              Approve
-            </Button>
+            <div className="flex items-center justify-between">
+              <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" onClick={handleApprove}>
+                Approve
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
