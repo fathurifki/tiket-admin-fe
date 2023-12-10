@@ -48,12 +48,21 @@ const ticketMachine = createMachine({
 
                     })
                 },
+                MANUAL_CHECK: {
+                    target: 'scannedFound',
+                    actions: assign({
+                        ticketId: (data) => {
+                            return data?.event?.payload
+                        }
+
+                    })
+                },
                 NOT_FOUND: 'scannedNotFound'
             }
         },
         scannedFound: {
             on: {
-                RESUME: 'scanning'
+                RESUME: 'scanning',
             },
             invoke: {
                 src: fromPromise((context) => {
@@ -94,7 +103,16 @@ const ticketMachine = createMachine({
                 idle: {
                     on: {
                         RESUME: '#ticket.scanning',
-                        COLLECTING: 'collecting'
+                        COLLECTING: 'collecting',
+                        MANUAL_CHECK: {
+                            target: '#ticket.scannedFound',
+                            actions: assign({
+                                ticketId: (data) => {
+                                    return data?.event?.payload
+                                }
+        
+                            })
+                        },
                     }
                 },
                 scanning: {},
@@ -193,6 +211,7 @@ const TicketInfo = () => {
                 {/* <div className="bg-gray-200 p-2 rounded">{JSON.stringify(fsm.value)}</div> */}
                 {fsm.value === 'scanning' && (
                     <div className="flex justify-center items-center w-full">
+                        <div className="animate-spin rounded-full mr-2 h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
                         <h2 className="text-center text-xl font-semibold">Scanning QR code...</h2>
                     </div>
                 )}
@@ -290,7 +309,7 @@ const QrCodePanel = ({ handleError, handleScan, handleManualCheckIn }) => {
                         send({ type: 'FOUND', payload: manualCheckIn });
                     }
                 }} />
-            <Button className="ml-4 bg-blue-200 hover:bg-blue-300 text-black font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline" onClick={()=> send({ type: 'FOUND', payload: manualCheckIn })}>Verify Ticket</Button>
+            <Button className="ml-4 bg-blue-200 hover:bg-blue-300 text-black font-bold py-1 px-4 rounded focus:outline-none focus:shadow-outline" onClick={()=> send({ type: 'MANUAL_CHECK', payload: manualCheckIn })}>Verify Ticket</Button>
         </div>
     </div>;
 }
