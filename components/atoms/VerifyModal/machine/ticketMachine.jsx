@@ -1,6 +1,7 @@
 "use client";
-import { createMachine, assign, fromPromise } from 'xstate';
+import { createMachine, fromPromise } from 'xstate';
 import { checkTicketValidity } from "../api/checkTicketValidity";
+import { setTicketIdAction, isValidTicket, setTicketDetailAction, isInvalidTicket } from './setTicketIdAction';
 
 export const ticketMachine = createMachine({
     id: 'ticket',
@@ -13,19 +14,11 @@ export const ticketMachine = createMachine({
             on: {
                 FOUND: {
                     target: 'scannedFound',
-                    actions: assign({
-                        ticketId: (data) => {
-                            return data?.event?.payload;
-                        }
-                    })
+                    actions: setTicketIdAction
                 },
                 MANUAL_CHECK: {
                     target: 'scannedFound',
-                    actions: assign({
-                        ticketId: (data) => {
-                            return data?.event?.payload;
-                        }
-                    })
+                    actions: setTicketIdAction
                 },
                 NOT_FOUND: 'scannedNotFound'
             }
@@ -44,16 +37,12 @@ export const ticketMachine = createMachine({
                 onDone: [
                     {
                         target: 'scannedValid',
-                        guard: (result) => {
-                            return result.event.output.valid;
-                        },
-                        actions: assign({ ticketDetail: ({ event }) => event.output }),
+                        guard: isValidTicket,
+                        actions: setTicketDetailAction,
                     },
                     {
                         target: 'scannedInvalid',
-                        guard: (result) => {
-                            return !result.event.output.valid;
-                        }
+                        guard: isInvalidTicket
                     }
                 ],
                 onError: {
@@ -76,11 +65,7 @@ export const ticketMachine = createMachine({
                         COLLECTING: 'collecting',
                         MANUAL_CHECK: {
                             target: '#ticket.scannedFound',
-                            actions: assign({
-                                ticketId: (data) => {
-                                    return data?.event?.payload;
-                                }
-                            })
+                            actions: setTicketIdAction
                         },
                     }
                 },
