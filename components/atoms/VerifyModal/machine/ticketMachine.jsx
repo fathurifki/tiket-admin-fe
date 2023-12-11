@@ -2,6 +2,8 @@
 import { createMachine, fromPromise } from 'xstate';
 import { checkTicketValidity } from "../api/checkTicketValidity";
 import { setTicketIdAction, isValidTicket, setTicketDetailAction, isInvalidTicket } from './setTicketIdAction';
+import { useMachine } from '@xstate/react';
+import { useCallback } from 'react';
 
 export const ticketMachine = createMachine({
     id: 'ticket',
@@ -84,3 +86,13 @@ export const ticketMachine = createMachine({
         }
     }
 });
+
+export const useTicketMachine = () => {
+    const [state, send] = useMachine(ticketMachine);
+    const handleScan = useCallback((data) => data && send({ type: 'FOUND', payload: data.text }), []);
+    const handleError = useCallback(() => { }, []);
+    const handleCollect = useCallback(() => send({ type: "COLLECT" }), []);
+    const handleClose = useCallback(() => send({ type: "CLOSE" }), []);
+    return { state, send, handleScan, handleError, handleCollect, handleClose };
+};
+
