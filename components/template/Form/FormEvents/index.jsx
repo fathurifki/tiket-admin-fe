@@ -45,6 +45,7 @@ import {
 import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
 import MyEditor from "@/components/molecules/WYSIWYG";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const FormSchema = z.object({
   event_name: z.string().min(1, {
@@ -290,302 +291,303 @@ const FormEvents = ({ ...props }) => {
   }
 
   return (
-    <div className="h-full">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-2/3 space-y-6"
-        >
-          <TitlePage title={props.isEdit ? "Edit Events" : "Create Events"} />
-          <FormField
-            control={form.control}
-            name="slug_name"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Slug</FormLabel>
-                <FormControl>
-                  <Input placeholder="Slug" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="event_name"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Event Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Event Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex gap-4 w-full ">
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Date Event</FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field?.value ? (
-                              format(field?.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field?.value}
-                          onSelect={field.onChange}
-                          // disabled={(date) =>
-                          //   date > new Date() || date < new Date("1900-01-01")
-                          // }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Time Event</FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field?.value ? (
-                              formatTimePicker(field.value)
-                            ) : (
-                              <span>Pick a time</span>
-                            )}
-                            <Clock className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <TimePicker {...field} />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+    props.isEdit ? (
+      <div className="h-full">
 
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Tabs defaultValue="eventDetails" >
+        <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="eventDetails">Event Details</TabsTrigger>
+            <TabsTrigger value="attendees">Attendees</TabsTrigger>
+          </TabsList>
 
-          <FormField
-            control={form.control}
-            name="region"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Region</FormLabel>
-                <FormControl>
-                  <Input placeholder="Region" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="event_image"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Event Image</FormLabel>
-                <FormControl>
-                  <UploadImage
-                    isEdit={props.isEdit}
-                    onImageUploadFile={(value) => {
-                      handleImageUpload("eventImageFile", value);
-                      field.onChange(value);
-                    }}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="event_map"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2 my-8">
-                <FormLabel>Event Map</FormLabel>
-                <FormControl>
-                  <UploadImage
-                    isEdit={props.isEdit}
-                    onImageUploadFile={(value) => {
-                      handleImageUpload("eventMapFile", value);
-                      field.onChange(value);
-                    }}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="category_ticket"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Ticket Package</FormLabel>
-                <div className="grid grid-cols-2 gap-2">
-                  {state?.payloadTicket?.map((ticket, i) => (
-                    <div
-                      className="flex flex-col space-y-4 bg-gray-200 shadow-md p-4 rounded-md w-full"
-                      key={i}
-                    >
-                      <div className="flex justify-between w-full">
-                        <Label>Section Name</Label>
-                        <Label
-                          className="font-bold"
-                          onClick={() => deleteTicketSection(i)}
-                        >
-                          Hapus
-                        </Label>
-                      </div>
-                      <Input
-                        value={ticket.sectionName}
-                        onChange={(e) =>
-                          onInputTicket("sectionName", e.target.value, i)
-                        }
-                      />
-                      <Label>Ticket Price Base</Label>
-                      <Input
-                        value={ticket.ticketPriceBase}
-                        onChange={(e) =>
-                          onInputTicket("ticketPriceBase", e.target.value, i)
-                        }
-                      />
-                      <Label>Ticket Quota</Label>
-                      <div className="flex gap-4">
-                        <Button
-                          onClick={() => handleCountQuotaTicket("decrement", i)}
-                        >
-                          -
-                        </Button>
-                        <Input
-                          value={ticket.ticketQuota}
-                          onChange={(e) =>
-                            onInputTicket("ticketQuota", e.target.value, i)
-                          }
-                        />
-                        <Button
-                          onClick={() => handleCountQuotaTicket("increment", i)}
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  <div
-                    onClick={onClickButton}
-                    className="flex flex-col space-y-4 bg-gray-200 hover:border-dashed hover:border-2 hover:border-black shadow-md p-4 rounded-md w-full h-[274px] justify-center items-center text-md font-bold "
-                  >
-                    <Plus size={110} />
-                    Add More Category Ticket
-                  </div>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <MyEditor {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {props.isEdit && (
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value)}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="draft">Draft</SelectItem>
-                          <SelectItem value="scheduled">On Going</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-          <Button onClick={onSubmit}>Submit</Button>
-        </form>
-      </Form>
-    </div>
+          <TabsContent value="eventDetails">
+            {newFunction(form, onSubmit, formatTimePicker, props, handleImageUpload, state, deleteTicketSection, onInputTicket, handleCountQuotaTicket, onClickButton)}
+          </TabsContent>
+
+          <TabsContent value="attendees">
+            <TitlePage title="Attendee" />
+          </TabsContent>
+        </Tabs>
+
+      </div>
+    ) : (
+      newFunction(form, onSubmit, formatTimePicker, props, handleImageUpload, state, deleteTicketSection, onInputTicket, handleCountQuotaTicket, onClickButton)
+    )
   );
 };
 
 export default FormEvents;
+function newFunction(form, onSubmit, formatTimePicker, props, handleImageUpload, state, deleteTicketSection, onInputTicket, handleCountQuotaTicket, onClickButton) {
+  return <Form {...form}>
+            <TitlePage title={props.isEdit ? "Edit Events" : "Create Events"} />
+
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="w-2/3 space-y-6"
+    >
+      <FormField
+        control={form.control}
+        name="slug_name"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Slug</FormLabel>
+            <FormControl>
+              <Input placeholder="Slug" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        control={form.control}
+        name="event_name"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Event Name</FormLabel>
+            <FormControl>
+              <Input placeholder="Event Name" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <div className="flex gap-4 w-full ">
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col gap-2">
+              <FormLabel>Date Event</FormLabel>
+              <FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field?.value ? (
+                          format(field?.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field?.value}
+                      onSelect={field.onChange}
+                      // disabled={(date) =>
+                      //   date > new Date() || date < new Date("1900-01-01")
+                      // }
+                      initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        <FormField
+          control={form.control}
+          name="time"
+          render={({ field }) => (
+            <FormItem className="flex flex-col gap-2">
+              <FormLabel>Time Event</FormLabel>
+              <FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field?.value ? (
+                          formatTimePicker(field.value)
+                        ) : (
+                          <span>Pick a time</span>
+                        )}
+                        <Clock className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <TimePicker {...field} />
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+      </div>
+
+      <FormField
+        control={form.control}
+        name="location"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Location</FormLabel>
+            <FormControl>
+              <Input placeholder="shadcn" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+
+      <FormField
+        control={form.control}
+        name="region"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Region</FormLabel>
+            <FormControl>
+              <Input placeholder="Region" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        control={form.control}
+        name="event_image"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Event Image</FormLabel>
+            <FormControl>
+              <UploadImage
+                isEdit={props.isEdit}
+                onImageUploadFile={(value) => {
+                  handleImageUpload("eventImageFile", value);
+                  field.onChange(value);
+                } }
+                {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        control={form.control}
+        name="event_map"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2 my-8">
+            <FormLabel>Event Map</FormLabel>
+            <FormControl>
+              <UploadImage
+                isEdit={props.isEdit}
+                onImageUploadFile={(value) => {
+                  handleImageUpload("eventMapFile", value);
+                  field.onChange(value);
+                } }
+                {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        control={form.control}
+        name="category_ticket"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Ticket Package</FormLabel>
+            <div className="grid grid-cols-2 gap-2">
+              {state?.payloadTicket?.map((ticket, i) => (
+                <div
+                  className="flex flex-col space-y-4 bg-gray-200 shadow-md p-4 rounded-md w-full"
+                  key={i}
+                >
+                  <div className="flex justify-between w-full">
+                    <Label>Section Name</Label>
+                    <Label
+                      className="font-bold"
+                      onClick={() => deleteTicketSection(i)}
+                    >
+                      Hapus
+                    </Label>
+                  </div>
+                  <Input
+                    value={ticket.sectionName}
+                    onChange={(e) => onInputTicket("sectionName", e.target.value, i)} />
+                  <Label>Ticket Price Base</Label>
+                  <Input
+                    value={ticket.ticketPriceBase}
+                    onChange={(e) => onInputTicket("ticketPriceBase", e.target.value, i)} />
+                  <Label>Ticket Quota</Label>
+                  <div className="flex gap-4">
+                    <Button
+                      onClick={() => handleCountQuotaTicket("decrement", i)}
+                    >
+                      -
+                    </Button>
+                    <Input
+                      value={ticket.ticketQuota}
+                      onChange={(e) => onInputTicket("ticketQuota", e.target.value, i)} />
+                    <Button
+                      onClick={() => handleCountQuotaTicket("increment", i)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <div
+                onClick={onClickButton}
+                className="flex flex-col space-y-4 bg-gray-200 hover:border-dashed hover:border-2 hover:border-black shadow-md p-4 rounded-md w-full h-[274px] justify-center items-center text-md font-bold "
+              >
+                <Plus size={110} />
+                Add More Category Ticket
+              </div>
+            </div>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2">
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <MyEditor {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+      {props.isEdit && (
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="flex flex-col gap-2">
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="scheduled">On Going</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+      )}
+      <Button onClick={onSubmit}>Submit</Button>
+    </form>
+  </Form>;
+}
+

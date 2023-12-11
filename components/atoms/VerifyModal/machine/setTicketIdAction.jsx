@@ -13,3 +13,7 @@ export const isValidTicket = (result) => {
 export const isInvalidTicket = (result) => {
     return !result.event.output.valid;
 };
+
+export const setTicketIdFromEvent = assign({
+    ticketId: (data) => data?.ticketId
+});

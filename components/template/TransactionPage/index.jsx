@@ -141,7 +141,7 @@ const TransactionsPageTemplate = ({ ...props }) => {
     <div className="h-full">
       <TitlePage
         buttonCreate
-        titleButton="Verify Transaction"
+        titleButton="Verify Ticket"
         title="Transactions"
         onClickButton={() => setState({ ...state, modal: true })}
       />

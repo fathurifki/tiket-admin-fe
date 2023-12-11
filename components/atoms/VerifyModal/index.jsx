@@ -32,7 +32,7 @@ export const VerifyTicketModal = ({ children, ...props }) => {
                     </div>
                 </DialogContent>
             </Dialog>
-            <Dialog open={state.value?.scannedValid === 'collecting'} onOpenChange={handleClose}>
+            <Dialog open={state.value?.scannedValid?.collecting === 'idle'} onOpenChange={handleClose}>
                 <DialogContent className="sm:max-w-[1000px] grid gap-4 py-4">
                     <DialogHeader>
                         <DialogTitle>Collect Ticket </DialogTitle>
