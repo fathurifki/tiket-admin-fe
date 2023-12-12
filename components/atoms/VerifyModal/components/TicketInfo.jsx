@@ -41,9 +41,9 @@ export const TicketInfo = () => {
                                 <span className="font-semibold text-md">Order Status:</span>
                                 <span className="text-md">{state.context.ticketDetail.order_detail.order_status}</span>
                             </div>
-                            <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${state.context.ticketDetail.order_detail.ticket_collected ? 'bg-green-200' : 'bg-red-200'}`}>
+                            <div className={`flex justify-between mb-2 p-2 border-1 border-gray-300 rounded ${state.context.ticketDetail.order_detail.ticket_received_time ? 'bg-green-200' : 'bg-red-200'}`}>
                                 <span className="font-semibold text-md">Ticket Collected:</span>
-                                <span className="text-md">{state.context.ticketDetail.order_detail.ticket_collected ? '✓' : '✗'}</span>
+                                <span className="text-md">{state.context.ticketDetail.order_detail?.ticket_received_time ? '✓' : '✗'}</span>
                             </div>
                         </div>
                         <div className="flex flex-col bg-gray-100 p-4 rounded-lg shadow-md">

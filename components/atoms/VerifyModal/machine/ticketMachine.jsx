@@ -4,6 +4,7 @@ import { checkTicketValidity } from "../api/checkTicketValidity";
 import { setTicketIdAction, setTicketIdFromEvent, isValidTicket, setTicketDetailAction, isInvalidTicket } from './setTicketIdAction';
 import { useMachine } from '@xstate/react';
 import { useCallback } from 'react';
+import { markTicketAsCollected } from '../api/markTicketAsCollected';
 
 export const ticketMachine = createMachine({
     id: 'ticket',
@@ -83,15 +84,18 @@ export const ticketMachine = createMachine({
                         },
                         marking: {
                             invoke: {
-                                src: fromPromise((context) => markTicketAsCollected(context.ticketId)),
-                                onDone: {
-                                    target: 'markingSuccess',
-                                    actions: setTicketIdFromEvent,
-                                    guard: "isSuccess",
+                                src: fromPromise((context) => {
+                                    return markTicketAsCollected(context.input.ticketId);
+                                }),
+                                input: ({ context }) => {
+                                    return { ticketId: context.ticketId };
                                 },
+                                onDone: [
+
+                                ],
                                 onError: {
-                                    target: 'idle',
-                                    guard: "isFail",
+                                    // target: 'scannedInvalid',
+                                    // actions: (_, event) => console.error(event.data)
                                 }
                             }
                         },
@@ -115,7 +119,14 @@ export const useTicketMachine = () => {
     const handleScan = useCallback((data) => data && send({ type: 'FOUND', payload: data.text }), []);
     const handleError = useCallback(() => { }, []);
     const handleCollect = useCallback(() => send({ type: "COLLECT" }), []);
-    const handleClose = useCallback(() => send({ type: "CLOSE" }), []);
-    return { state, send, handleScan, handleError, handleCollect, handleClose };
+    const handleMark = useCallback(() => {
+        console.log("Mark action triggered");
+        send({ type: "MARK" });
+    }, []);
+    const handleClose = useCallback(() => {
+        console.log("Close action triggered");
+        send({ type: "CLOSE" });
+    }, []);
+    return { state, send, handleScan, handleError, handleCollect, handleMark, handleClose };
 };
 
