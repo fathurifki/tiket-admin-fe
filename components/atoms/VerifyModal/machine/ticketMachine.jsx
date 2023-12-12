@@ -1,7 +1,7 @@
 "use client";
 import { createMachine, fromPromise } from 'xstate';
 import { checkTicketValidity } from "../api/checkTicketValidity";
-import { setTicketIdAction, setTicketIdFromEvent, isValidTicket, setTicketDetailAction, isInvalidTicket } from './setTicketIdAction';
+import { setTicketIdAction, setTicketIdFromEvent, isValidTicket, setTicketDetailAction, isInvalidTicket, isCollectFailed, isCollectSuccess } from './setTicketIdAction';
 import { useMachine } from '@xstate/react';
 import { useCallback } from 'react';
 import { markTicketAsCollected } from '../api/markTicketAsCollected';
@@ -91,11 +91,17 @@ export const ticketMachine = createMachine({
                                     return { ticketId: context.ticketId };
                                 },
                                 onDone: [
-
+                                    {
+                                        target: '#ticket.scannedFound',
+                                        guard: isCollectSuccess,
+                                    },
+                                    {
+                                        target: '#ticket.scannedFound',
+                                        guard: isCollectFailed
+                                    }
                                 ],
                                 onError: {
-                                    // target: 'scannedInvalid',
-                                    // actions: (_, event) => console.error(event.data)
+                                    target: '#ticket.scannedFound',
                                 }
                             }
                         },

@@ -7,13 +7,23 @@ export const setTicketIdAction = assign({
     }
 });
 export const setTicketDetailAction = assign({ ticketDetail: ({ event }) => event.output });
-export const isValidTicket = (result) => {
-    return result.event.output.valid;
-};
-export const isInvalidTicket = (result) => {
-    return !result.event.output.valid;
-};
 
 export const setTicketIdFromEvent = assign({
     ticketId: (data) => data?.ticketId
 });
+
+export const isValidTicket = (result) => {
+    return result.event.output.valid;
+};
+
+export const isInvalidTicket = (result) => {
+    return !result.event.output.valid;
+};
+
+export const isCollectSuccess = (result) => {
+    return !result.status === 200;
+};
+
+export const isCollectFailed = (result) => {
+    return !result.status !== 200;
+};
