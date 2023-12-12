@@ -34,7 +34,7 @@ const TimePicker = ({ ...props }) => {
           <SelectContent className="max-h-[20vh] overflow-auto">
             <SelectGroup className="bg-transparent text-xl appearance-none outline-none mr-4">
               <SelectLabel>Select Hour</SelectLabel>
-              {[...Array(12)].map((_, i) => (
+              {[...Array(24)].map((_, i) => (
                 <SelectItem key={i + 1} value={i}>
                   {i < 10 ? `0${i}` : i}
                 </SelectItem>

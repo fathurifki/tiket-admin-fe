@@ -85,9 +85,9 @@ const FormStaticPage = ({ ...props }) => {
       url: `/admin/page/view/${props.id}`,
     });
     form.reset({
-      slug: res?.slug,
-      page_title: res?.title,
-      content: res?.content,
+      slug: res?.data?.slug,
+      page_title: res?.data?.title,
+      content: res?.data?.content,
     });
   }
 
@@ -136,7 +136,7 @@ const FormStaticPage = ({ ...props }) => {
               <FormItem className="flex flex-col gap-2">
                 <FormLabel>Slug</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input placeholder="Slug" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -149,7 +149,7 @@ const FormStaticPage = ({ ...props }) => {
               <FormItem className="flex flex-col gap-2">
                 <FormLabel>Page Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="shadcn" {...field} />
+                  <Input placeholder="Title" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
