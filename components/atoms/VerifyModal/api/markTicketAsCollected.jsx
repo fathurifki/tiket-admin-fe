@@ -2,10 +2,10 @@
 import fetchingData from "@/lib/api";
 
 
-export const markTicketAsCollected = async (ticketId) => {
-    const url = `/admin/transaction/mark-collected/${ticketId}`;
+export const markTicketAsCollected = async (orderID) => {
+    const url = `/admin/transaction/ticket_received/${orderID}`;
     try {
-        const response = await fetchingData({ url, method: 'POST' });
+        const response = await fetchingData({ url, method: 'PUT' });
         return response.data;
     } catch (error) {
         throw error;
