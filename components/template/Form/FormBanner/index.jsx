@@ -118,7 +118,6 @@ const FormBanner = ({ ...props }) => {
                     <SelectContent>
                       <SelectGroup>
                         <SelectItem value="url">URL</SelectItem>
-                        <SelectItem value="image">Image</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>

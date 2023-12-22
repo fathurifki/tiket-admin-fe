@@ -21,29 +21,13 @@ const comicNeue = Comic_Neue({
 
 function MyApp({ Component, pageProps, router }) {
   const isLoginPage = router.pathname === "/login";
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== "undefined" ? window.innerWidth : 1000
-  );
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setWindowWidth(window.innerWidth);
-      window.addEventListener("resize", () =>
-        setWindowWidth(window.innerWidth)
-      );
-    }
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("resize", () =>
-          setWindowWidth(window.innerWidth)
-        );
-      }
-    };
-  }, []);
 
   return (
     <>
-      {windowWidth > 500 ? (
+      <div className="lg:hidden md:hidden xl:hidden block min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
+        <p>Not support mobile, please use desktop view for better experience</p>
+      </div>
+      <div className="hidden md:block">
         <ToastProvider>
           {isLoginPage ? (
             <Component {...pageProps} />
@@ -54,13 +38,7 @@ function MyApp({ Component, pageProps, router }) {
           )}
           <Toaster />
         </ToastProvider>
-      ) : (
-        <div className="min-h-screen flex flex-col justify-center items-center text-2xl font-bold text-center">
-          <p>
-            Not support mobile, please use desktop view for better experience
-          </p>
-        </div>
-      )}
+      </div>
     </>
   );
 }
