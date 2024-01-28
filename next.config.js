@@ -46,6 +46,12 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "tiket-minio-2-api.caprover.mantratiket.com",
+        port: "",
+        pathname: "/assets/**",
+      },
+      {
+        protocol: "https",
         hostname: "images.unsplash.com",
         port: "",
         pathname: "/**",
