@@ -4,10 +4,9 @@ import TransactionsPageTemplate from "@/components/template/TransactionPage";
 import fetchingData from "@/lib/api";
 import { useRouter } from "next/router";
 
-function TransactionsPage({ data }) {
+function TransactionsPage({ data, page = 1, perPage = 10 }) {
   const router = useRouter();
   const { slug } = router.query;
-
   const handlePageChange = (newPage) => {
     router.push({
       pathname: router.pathname,
@@ -18,7 +17,7 @@ function TransactionsPage({ data }) {
   const handleSearchValue = (searchValue) => {
     router.push({
       pathname: router.pathname,
-      query: { ...router.query, search: searchValue },
+      query: { ...router.query, page: 1, status: searchValue },
     });
   };
 
@@ -30,6 +29,8 @@ function TransactionsPage({ data }) {
         data={data}
         handlePageChange={handlePageChange}
         handleSearchValue={handleSearchValue}
+        page={page}
+        perPage={perPage}
       />
     );
   }
@@ -65,9 +66,12 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
         "content-type": "application/json; charset=UTF-8",
       },
     });
+
     return {
       props: {
         data: res.data || null,
+        page: parseInt(page, 10),
+        perPage: parseInt(perPage, 10),
         res,
       },
     };

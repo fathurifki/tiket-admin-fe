@@ -230,7 +230,7 @@ const FormEvents = ({ ...props }) => {
     let req;
     try {
       const formData = new FormData();
-
+      
       const payload = {
         ...data,
         date: data?.time
@@ -267,21 +267,26 @@ const FormEvents = ({ ...props }) => {
         );
       }
 
-      if (data.service_fee_type === 'fixed' && !Number.isInteger(Number(data.service_fee))) {
+      if (
+        data?.service_fee_type === "fixed" &&
+        !Number.isInteger(Number(data?.service_fee))
+      ) {
         toast({
           variant: "destructive",
           title: "Validation error",
           description: "Fee must be a fixed price",
         });
-        return;
       }
-      if (data.service_fee_type === 'percentage' && !data.service_fee.includes('.')) {
+
+      if (
+        data?.service_fee_type === "percentage" &&
+        !data?.service_fee.toString().includes(".")
+      ) {
         toast({
           variant: "destructive",
           title: "Validation error",
           description: "Fee must be a percentage",
         });
-        return;
       }
 
       req = await fetchingData({

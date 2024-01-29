@@ -10,9 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/router";
 import { VerifyTicketModal } from "@/components/atoms/VerifyModal";
 import { useState } from "react";
@@ -25,7 +27,6 @@ const TransactionsPageTemplate = ({ ...props }) => {
     data: props?.data?.data || [],
   });
 
-  
   const columns = [
     {
       id: "select",
@@ -60,7 +61,9 @@ const TransactionsPageTemplate = ({ ...props }) => {
       cell: ({ row }) => {
         const transactions = row.original;
         return (
-          <span>{transactions?.user_first_name} {transactions?.user_last_name}</span>
+          <span>
+            {transactions?.user_first_name} {transactions?.user_last_name}
+          </span>
         );
       },
     },
@@ -74,7 +77,14 @@ const TransactionsPageTemplate = ({ ...props }) => {
       cell: ({ row }) => {
         const transactions = row.original;
         try {
-          return <span>{format(new Date(transactions?.order_date), "dd MMMM yyyy, hh:mm a")}</span>;
+          return (
+            <span>
+              {format(
+                new Date(transactions?.order_date),
+                "dd MMMM yyyy, hh:mm a"
+              )}
+            </span>
+          );
         } catch (error) {
           return <span>Invalid date</span>;
         }
@@ -95,7 +105,12 @@ const TransactionsPageTemplate = ({ ...props }) => {
         const transactions = row.original;
         try {
           return (
-            <span>{format(new Date(transactions?.event_date), "dd MMMM yyyy, hh:mm a")}</span>
+            <span>
+              {format(
+                new Date(transactions?.event_date),
+                "dd MMMM yyyy, hh:mm a"
+              )}
+            </span>
           );
         } catch (error) {
           return <span>Invalid date</span>;
@@ -137,6 +152,25 @@ const TransactionsPageTemplate = ({ ...props }) => {
     router.push("/transactions/create");
   };
 
+  const filterStatus = [
+    {
+      value: "paid",
+      label: "Paid",
+    },
+    {
+      value: "pending",
+      label: "Pending",
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled",
+    },
+    {
+      value: "expired",
+      label: "Expired",
+    },
+  ];
+
   return (
     <div className="h-full">
       <TitlePage
@@ -161,7 +195,43 @@ const TransactionsPageTemplate = ({ ...props }) => {
             handleSearchValue={(value) => props.handleSearchValue(value)}
             page={props.data?.page}
             totalPages={props?.data?.total_pages}
-            placeholder="Filter Transactions"
+            filteredBy="order_status"
+            searchFilter={false}
+            renderComponent={(table) => (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="ml-auto">
+                    Status Payment <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="p-2">
+                  {filterStatus?.map((v) => (
+                    <DropdownMenuCheckboxItem
+                      key={v.value}
+                      checked={
+                        table.getColumn('order_status')?.getFilterValue() ===
+                        v.value
+                      }
+                      onCheckedChange={(value) => {
+                        if (value) {
+                          props.handleSearchValue(v.value);
+                          table
+                            .getColumn('order_status')
+                            ?.setFilterValue(v.value);
+                        } else {
+                          props.handleSearchValue("");
+                          table
+                            .getColumn('order_status')
+                            ?.setFilterValue("");
+                        }
+                      }}
+                    >
+                      {v.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           />
         </div>
       </div>

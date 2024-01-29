@@ -18,6 +18,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,8 +40,10 @@ export function TanTableCustom({ searchFilter = true, ...props }) {
     page: PropTypes.number.isRequired,
     totalPages: PropTypes.number.isRequired,
     filteredBy: PropTypes.string.isRequired,
-    placeholder: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
     searchFilter: PropTypes.bool,
+    customFilter: PropTypes.node,
+    renderComponent: PropTypes.func,
   };
 
   const [sorting, setSorting] = React.useState([]);
@@ -70,45 +73,50 @@ export function TanTableCustom({ searchFilter = true, ...props }) {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        {searchFilter && (
-          <Input
-            placeholder={props?.placeholder}
-            value={table.getColumn(props?.filteredBy)?.getFilterValue() || ""}
-            onChange={(event) => {
-              table
-                .getColumn(props?.filteredBy)
-                ?.setFilterValue(event.target.value);
-              props.handleSearchValue(event.target.value);
-            }}
-            className="max-w-sm"
-          />
-        )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="w-full">
+          {searchFilter && (
+            <Input
+              placeholder={props?.placeholder}
+              value={table.getColumn(props?.filteredBy)?.getFilterValue() || ""}
+              onChange={(event) => {
+                table
+                  .getColumn(props?.filteredBy)
+                  ?.setFilterValue(event.target.value);
+                props.handleSearchValue(event.target.value);
+              }}
+              className="max-w-sm"
+            />
+          )}
+        </div>
+        <div className="flex gap-4">
+          {props.renderComponent && props.renderComponent(table)}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
