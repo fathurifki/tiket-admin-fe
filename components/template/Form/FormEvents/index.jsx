@@ -46,6 +46,7 @@ import dynamic from "next/dynamic";
 import fetchingData from "../../../../lib/api";
 import MyEditor from "@/components/molecules/WYSIWYG";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AttendeesPage from "../../AttendeesPage";
 
 const FormSchema = z.object({
   event_name: z.string().min(1, {
@@ -342,7 +343,7 @@ const FormEvents = ({ ...props }) => {
         </TabsContent>
 
         <TabsContent value="attendees">
-          <TitlePage title="Attendee" />
+          <AttendeesPage id={props.id} />
         </TabsContent>
       </Tabs>
     </div>

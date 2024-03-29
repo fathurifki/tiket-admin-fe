@@ -82,7 +82,7 @@ export function TanTableCustom({ searchFilter = true, ...props }) {
                 table
                   .getColumn(props?.filteredBy)
                   ?.setFilterValue(event.target.value);
-                props.handleSearchValue(event.target.value);
+                props?.handleSearchValue(event.target.value);
               }}
               className="max-w-sm"
             />
@@ -146,14 +146,18 @@ export function TanTableCustom({ searchFilter = true, ...props }) {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const renderedCellValue = flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      );
+                      const cellValue = renderedCellValue?.props?.getValue() !== null ? renderedCellValue : "N/A";
+                      return (
+                        <TableCell key={cell.id}>
+                          {cellValue}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (

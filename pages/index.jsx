@@ -1,7 +1,8 @@
 import RootLayout from "@/app/layout";
-import DashboardPage from "./dashboard";
 import withAuth from "@/components/atoms/WithAuth";
 import { withAuthServerSideProps } from "@/components/atoms/WithAuthSSR";
+import fetchingData from "@/lib/api";
+import DashboardPage from "./dashboard";
 
 function Root({ data }) {
   return <DashboardPage />;
@@ -20,7 +21,6 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
       url: `/admin/user/list?page=${page}&per_page=${perPage}&search=${search}`,
       context,
     });
-
     return {
       props: {
         data: res?.data || {},

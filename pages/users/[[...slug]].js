@@ -68,7 +68,6 @@ export const getServerSideProps = withAuthServerSideProps(async (context) => {
         "content-type": "application/json; charset=UTF-8",
       },
     });
-
     return {
       props: {
         data: res?.data || {},
